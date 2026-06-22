@@ -1,0 +1,6 @@
+# Python 3.11+ (tested on 3.14). Versions below ship prebuilt wheels for 3.14.
+fastapi>=0.138.0
+uvicorn[standard]>=0.34.0
+python-multipart>=0.0.20
+pydantic>=2.13.0
+Pillow>=11.0.0
