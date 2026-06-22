@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import BackendGate from './components/BackendGate.jsx'
 import Landing from './pages/Landing.jsx'
 import ConsoleLayout from './pages/ConsoleLayout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
@@ -16,7 +17,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
-      <Route path="/console" element={<ConsoleLayout />}>
+      <Route path="/console" element={<BackendGate><ConsoleLayout /></BackendGate>}>
         <Route index element={<Dashboard />} />
         <Route path="fusion" element={<FusionOrchestrator />} />
         <Route path="scam-detector" element={<ScamDetector />} />
