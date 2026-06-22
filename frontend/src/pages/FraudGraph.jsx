@@ -4,6 +4,7 @@ import { Network, AlertOctagon, Users, CreditCard, Phone } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
 import { getFraudGraph, getFraudPackages } from '../api.js'
+import { useTheme } from '../theme.js'
 
 const TYPE_COLOR = {
   victim: '#4dabf7',
@@ -26,6 +27,8 @@ export default function FraudGraph() {
   const wrapRef = useRef(null)
   const fgRef = useRef(null)
   const [dims, setDims] = useState({ w: 600, h: 460 })
+  const theme = useTheme()
+  const light = theme === 'light'
 
   useEffect(() => {
     Promise.all([getFraudGraph(), getFraudPackages()])
@@ -75,9 +78,9 @@ export default function FraudGraph() {
                 graphData={data}
                 width={dims.w}
                 height={dims.h}
-                backgroundColor="#16161a"
+                backgroundColor={light ? '#ffffff' : '#16161a'}
                 nodeRelSize={5}
-                linkColor={() => 'rgba(255,255,255,0.18)'}
+                linkColor={() => (light ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.18)')}
                 linkDirectionalParticles={2}
                 linkDirectionalParticleWidth={1.6}
                 linkDirectionalParticleColor={() => '#f7941e'}
@@ -93,7 +96,7 @@ export default function FraudGraph() {
                   }
                   if (scale > 1.3 || node.type === 'kingpin' || node.type === 'mule_account') {
                     ctx.font = `${10 / scale + 3}px Inter`
-                    ctx.fillStyle = '#cbd5e1'
+                    ctx.fillStyle = light ? '#334155' : '#cbd5e1'
                     ctx.textAlign = 'center'
                     ctx.fillText(node.label, node.x, node.y + r + 7)
                   }

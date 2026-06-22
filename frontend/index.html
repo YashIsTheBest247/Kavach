@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <title>Kavach AI — Digital Public Safety Intelligence</title>
+    <script>
+      // Apply saved theme before paint to avoid a flash.
+      try { document.documentElement.setAttribute('data-theme', localStorage.getItem('kavach-theme') || 'dark') } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

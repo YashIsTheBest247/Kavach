@@ -3,7 +3,7 @@ import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
   PhoneCall, MapPin, ArrowLeft,
 } from 'lucide-react'
-import { Logo } from '../components/ui.jsx'
+import { Logo, ThemeToggle } from '../components/ui.jsx'
 
 const LINKS = [
   { to: '/console', end: true, icon: LayoutDashboard, label: 'Command Dashboard' },
@@ -55,11 +55,14 @@ export default function ConsoleLayout() {
 
 export function PageHeader({ title, subtitle, accent }) {
   return (
-    <div className="border-b border-white/5 bg-ink-800/60 px-8 py-6">
-      <h1 className="font-display text-2xl font-700 uppercase text-white">
-        {title} {accent && <span className="text-brand">{accent}</span>}
-      </h1>
-      {subtitle && <p className="text-sm text-gray-400 mt-1">{subtitle}</p>}
+    <div className="border-b border-white/5 bg-ink-800/60 px-8 py-6 flex items-start justify-between gap-4">
+      <div>
+        <h1 className="font-display text-2xl font-700 uppercase text-white">
+          {title} {accent && <span className="text-brand">{accent}</span>}
+        </h1>
+        {subtitle && <p className="text-sm text-gray-400 mt-1">{subtitle}</p>}
+      </div>
+      <ThemeToggle className="shrink-0" />
     </div>
   )
 }

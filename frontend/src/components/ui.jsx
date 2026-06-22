@@ -1,4 +1,16 @@
-import { Shield } from 'lucide-react'
+import { Shield, Sun, Moon } from 'lucide-react'
+import { useTheme, toggleTheme } from '../theme.js'
+
+export function ThemeToggle({ className = '' }) {
+  const theme = useTheme()
+  return (
+    <button onClick={toggleTheme} aria-label="Toggle light / dark theme"
+      title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      className={`grid place-items-center w-9 h-9 rounded-lg border border-white/10 text-gray-300 hover:text-brand hover:border-brand/50 transition-colors ${className}`}>
+      {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+    </button>
+  )
+}
 
 export function Logo({ size = 'md' }) {
   const s = size === 'lg' ? 'text-2xl' : 'text-xl'

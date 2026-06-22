@@ -4,7 +4,7 @@ import {
   Play, ShieldCheck, Network, ScanLine, MessageSquareWarning, MapPin,
   PhoneCall, ArrowRight, Zap, Lock, Globe,
 } from 'lucide-react'
-import { Logo, RiskBadge } from '../components/ui.jsx'
+import { Logo, RiskBadge, ThemeToggle } from '../components/ui.jsx'
 import { analyzeScam } from '../api.js'
 
 const NAV = [
@@ -49,10 +49,13 @@ function TopNav() {
             </a>
           ))}
         </nav>
-        <Link to="/console"
-          className="bg-brand hover:bg-brand-600 text-black font-700 text-sm px-5 py-2.5 rounded transition-colors shadow-glow">
-          LAUNCH CONSOLE
-        </Link>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Link to="/console"
+            className="bg-brand hover:bg-brand-600 text-black font-700 text-sm px-5 py-2.5 rounded transition-colors shadow-glow">
+            LAUNCH CONSOLE
+          </Link>
+        </div>
       </div>
     </header>
   )
@@ -245,7 +248,7 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <Logo />
         <p className="text-xs text-gray-500 text-center">
-          ET AI Hackathon 2026 · Problem #6 — Digital Public Safety · Helpline <span className="text-brand font-600">1930</span> · cybercrime.gov.in
+           Helpline <span className="text-brand font-600">1930</span> · cybercrime.gov.in
         </p>
       </div>
     </footer>

@@ -4,10 +4,12 @@ import { MapPin, TrendingUp, IndianRupee } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { Spinner } from '../components/ui.jsx'
 import { getHotspots } from '../api.js'
+import { useTheme } from '../theme.js'
 
 export default function CrimeMap() {
   const [spots, setSpots] = useState(null)
   const [err, setErr] = useState(null)
+  const theme = useTheme()
 
   useEffect(() => {
     getHotspots().then((d) => setSpots(d.hotspots)).catch(() => setErr('Backend not reachable on :8000'))
@@ -39,8 +41,11 @@ export default function CrimeMap() {
             {spots && (
               <MapContainer center={[22.5, 79]} zoom={5} style={{ height: '100%', width: '100%' }} scrollWheelZoom>
                 <TileLayer
-                  attribution='&copy; OpenStreetMap'
-                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                  key={theme}
+                  attribution='&copy; OpenStreetMap, &copy; CARTO'
+                  url={theme === 'light'
+                    ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'}
                 />
                 {spots.map((s) => (
                   <CircleMarker key={s.city} center={[s.lat, s.lng]} radius={radius(s.complaints)}

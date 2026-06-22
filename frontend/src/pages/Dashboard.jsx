@@ -7,12 +7,17 @@ import { ShieldCheck, Network, Banknote, Timer, AlertTriangle, IndianRupee } fro
 import { PageHeader } from './ConsoleLayout.jsx'
 import { StatCard, Spinner } from '../components/ui.jsx'
 import { getStats } from '../api.js'
+import { useTheme } from '../theme.js'
 
 const PIE_COLORS = ['#f7941e', '#ff6b6b', '#4dabf7', '#ffd43b', '#9775fa', '#38d9a9']
 
 export default function Dashboard() {
   const [s, setS] = useState(null)
   const [err, setErr] = useState(null)
+  const theme = useTheme()
+  const light = theme === 'light'
+  const gridColor = light ? '#e5e7eb' : '#26262d'
+  const tip = { background: light ? '#ffffff' : '#16161a', border: `1px solid ${gridColor}`, borderRadius: 8, color: light ? '#1f2937' : '#e7e7ea' }
 
   useEffect(() => {
     getStats().then(setS).catch(() => setErr('Backend not reachable on :8000'))
@@ -60,10 +65,10 @@ export default function Dashboard() {
                     <stop offset="95%" stopColor="#4dabf7" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#26262d" />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                 <XAxis dataKey="day" stroke="#6b7280" fontSize={12} />
                 <YAxis stroke="#6b7280" fontSize={12} />
-                <Tooltip contentStyle={{ background: '#16161a', border: '1px solid #26262d', borderRadius: 8 }} />
+                <Tooltip contentStyle={tip} />
                 <Area type="monotone" dataKey="flagged" stroke="#f7941e" fill="url(#g1)" strokeWidth={2} />
                 <Area type="monotone" dataKey="blocked" stroke="#4dabf7" fill="url(#g2)" strokeWidth={2} />
               </AreaChart>
@@ -80,7 +85,7 @@ export default function Dashboard() {
                   {s.scam_mix.map((e, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                 </Pie>
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: '#16161a', border: '1px solid #26262d', borderRadius: 8 }} />
+                <Tooltip contentStyle={tip} />
               </PieChart>
             </ResponsiveContainer>
           </div>

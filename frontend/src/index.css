@@ -2,8 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   Theme tokens. Values are space-separated RGB triplets so
+   Tailwind's /opacity modifiers keep working (rgb(var() / a)).
+   Default = dark. [data-theme="light"] flips everything.
+   ============================================================ */
 :root {
   color-scheme: dark;
+  --ink-900: 10 10 12;
+  --ink-800: 17 17 20;
+  --ink-700: 22 22 26;
+  --ink-600: 29 29 34;
+  --ink-500: 38 38 45;
+
+  --gray-200: 231 231 234;
+  --gray-300: 203 206 212;
+  --gray-400: 156 163 175;
+  --gray-500: 107 114 128;
+  --gray-600: 75 85 99;
+
+  --white: 255 255 255;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ink-900: 238 240 243;   /* page background + input fields */
+  --ink-800: 248 249 251;   /* nav / sidebar / section bands */
+  --ink-700: 255 255 255;   /* cards */
+  --ink-600: 226 232 240;
+  --ink-500: 209 213 219;   /* borders */
+
+  --gray-200: 31 41 55;     /* primary text (was lightest -> now darkest) */
+  --gray-300: 55 65 81;
+  --gray-400: 75 85 99;
+  --gray-500: 107 114 128;
+  --gray-600: 156 163 175;
+
+  --white: 17 17 20;        /* text-white headings -> near-black; white/x overlays -> subtle dark */
 }
 
 html, body, #root {
@@ -12,10 +47,11 @@ html, body, #root {
 
 body {
   margin: 0;
-  background: #0a0a0c;
-  color: #e7e7ea;
+  background: rgb(var(--ink-900));
+  color: rgb(var(--gray-200));
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .font-display {
@@ -35,24 +71,37 @@ body {
     linear-gradient(120deg, #0a0a0c 0%, #14141a 45%, #0d1018 100%);
 }
 
+:root[data-theme='light'] .hero-bokeh {
+  background:
+    radial-gradient(circle at 18% 30%, rgba(247,148,30,0.14), transparent 9%),
+    radial-gradient(circle at 70% 22%, rgba(80,160,255,0.14), transparent 8%),
+    radial-gradient(circle at 82% 60%, rgba(247,148,30,0.12), transparent 9%),
+    radial-gradient(circle at 30% 70%, rgba(120,200,255,0.12), transparent 8%),
+    radial-gradient(circle at 90% 85%, rgba(80,160,255,0.10), transparent 8%),
+    linear-gradient(120deg, #eef1f6 0%, #e6ebf4 45%, #eef1f6 100%);
+}
+
 .diag-stripes {
   background-image: repeating-linear-gradient(
     -45deg,
-    rgba(255,255,255,0.015) 0px,
-    rgba(255,255,255,0.015) 1px,
+    rgba(127,127,127,0.04) 0px,
+    rgba(127,127,127,0.04) 1px,
     transparent 1px,
     transparent 14px
   );
 }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #0a0a0c; }
-::-webkit-scrollbar-thumb { background: #2a2a31; border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a42; }
+::-webkit-scrollbar-track { background: rgb(var(--ink-900)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--ink-500)); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--ink-600)); }
 
-/* leaflet dark fix */
-.leaflet-container { background: #0d0d10; }
-.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #16161a; color: #e7e7ea; }
+/* leaflet theming */
+.leaflet-container { background: rgb(var(--ink-700)); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: rgb(var(--ink-700));
+  color: rgb(var(--gray-200));
+}
 
 @keyframes pulse-ring {
   0% { transform: scale(0.9); opacity: 0.7; }
