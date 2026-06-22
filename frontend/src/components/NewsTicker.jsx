@@ -17,7 +17,7 @@ export default function NewsTicker() {
   return (
     <div className="relative z-50 flex items-stretch bg-ink-900 border-b border-white/10 text-xs">
       {/* fixed label */}
-      <div className="shrink-0 flex items-center gap-2 bg-brand text-black font-700 uppercase tracking-wider px-4">
+      <div className="shrink-0 flex items-center gap-2 bg-brand text-black font-700 uppercase tracking-wider px-3 md:px-4 whitespace-nowrap text-[10px] md:text-xs">
         <span className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full rounded-full bg-black opacity-60 animate-ping" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-black" />

@@ -88,9 +88,13 @@ export default function ConsoleLayout() {
 function ConsoleMain() {
   const location = useLocation()
 
-  // Jump to the top whenever the route changes (don't carry scroll between pages).
+  // Jump to the top whenever the route changes (don't carry scroll between
+  // pages). Reset window + document scroll so it works on mobile too.
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    if (document.scrollingElement) document.scrollingElement.scrollTop = 0
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
   }, [location.pathname])
 
   return (

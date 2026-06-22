@@ -45,6 +45,12 @@ html, body, #root {
   height: 100%;
 }
 
+/* Never allow horizontal scroll on small screens. */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   margin: 0;
   background: rgb(var(--ink-900));
