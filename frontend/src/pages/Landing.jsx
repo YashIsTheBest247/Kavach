@@ -5,6 +5,7 @@ import {
   PhoneCall, ArrowRight, Mic, Target, Workflow,
 } from 'lucide-react'
 import { Logo, RiskBadge, ThemeToggle, LangToggle } from '../components/ui.jsx'
+import NewsTicker from '../components/NewsTicker.jsx'
 import { analyzeScam } from '../api.js'
 import { useLang, t } from '../i18n.js'
 
@@ -12,6 +13,7 @@ const NAV = [
   { en: 'HOME', hi: 'होम', href: '#home' },
   { en: 'FEATURES', hi: 'विशेषताएँ', href: '#features' },
   { en: 'LIVE DEMO', hi: 'लाइव डेमो', href: '#demo' },
+  { en: 'NEWS', hi: 'समाचार', to: '/console/news' },
 ]
 
 const FEATURES = [
@@ -48,6 +50,7 @@ export default function Landing() {
   useLang()
   return (
     <div id="home" className="min-h-screen bg-ink-900 text-gray-200 fade-in">
+      <NewsTicker />
       <TopNav />
       <Hero />
       <LiveDemo />
@@ -64,10 +67,17 @@ function TopNav() {
         <Logo />
         <nav className="hidden md:flex items-center gap-7">
           {NAV.map((n) => (
-            <a key={n.href} href={n.href}
-              className="text-xs font-600 tracking-widest text-gray-300 hover:text-brand transition-colors">
-              {t(n.en, n.hi)}
-            </a>
+            n.to ? (
+              <Link key={n.en} to={n.to}
+                className="text-xs font-600 tracking-widest text-brand hover:text-brand-400 transition-colors">
+                {t(n.en, n.hi)}
+              </Link>
+            ) : (
+              <a key={n.en} href={n.href}
+                className="text-xs font-600 tracking-widest text-gray-300 hover:text-brand transition-colors">
+                {t(n.en, n.hi)}
+              </a>
+            )
           ))}
         </nav>
         <div className="flex items-center gap-2 md:gap-3">
@@ -137,7 +147,7 @@ function Hero() {
 const PRESET = "Sir I am Inspector from CBI. Your Aadhaar is linked to a money laundering case and there is an arrest warrant. You are under digital arrest — do not disconnect this video call and do not tell anyone. Transfer all your funds to this RBI verification account immediately to prove innocence, it is refundable."
 
 function LiveDemo() {
-  const [text, setText] = useState(PRESET)
+  const [text, setText] = useState('')
   const [res, setRes] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -171,10 +181,13 @@ function LiveDemo() {
             className="w-full bg-ink-900 border border-ink-500 rounded-lg p-4 text-sm text-gray-200 focus:outline-none focus:border-brand resize-none"
             placeholder={t('Paste the message or call transcript here…', 'संदेश या कॉल ट्रांसक्रिप्ट यहाँ पेस्ट करें…')}
           />
-          <div className="flex items-center justify-between mt-4 gap-4 flex-wrap">
-            <span className="text-xs text-gray-500">{t('Tip: edit the preset to test your own message.', 'सुझाव: अपना संदेश जाँचने के लिए प्रीसेट संपादित करें।')}</span>
-            <button onClick={run} disabled={loading}
-              className="inline-flex items-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-60 text-black font-700 px-6 py-2.5 rounded transition-colors">
+          <div className="flex items-center justify-between mt-4 gap-3 flex-wrap">
+            <button onClick={() => { setText(PRESET); setRes(null) }}
+              className="inline-flex items-center gap-2 border border-white/15 hover:border-brand/50 text-gray-300 hover:text-white text-sm px-4 py-2.5 rounded transition-colors">
+              {t('Load test phrase', 'टेस्ट वाक्य लोड करें')}
+            </button>
+            <button onClick={run} disabled={loading || !text.trim()}
+              className="inline-flex items-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-50 text-black font-700 px-6 py-2.5 rounded transition-colors">
               {loading ? t('Analysing…', 'विश्लेषण हो रहा है…') : t('Analyse threat', 'खतरे का विश्लेषण करें')}
             </button>
           </div>

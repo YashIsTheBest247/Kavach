@@ -106,6 +106,7 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 |---|---|---|
 | GET | `/api/health` | health check |
 | GET | `/api/stats` | dashboard metrics |
+| GET | `/api/news` | live scam/fraud news from Economic Times RSS (filtered, cached, fallback) |
 | GET | `/api/llm/status` | whether the Gemini AI layer is configured |
 | POST | `/api/scam/analyze` | analyse a message/transcript → risk, tactics, evidence, advisory (+ Gemini if `use_ai:true`) |
 | GET | `/api/scam/samples` | sample scam scenarios |

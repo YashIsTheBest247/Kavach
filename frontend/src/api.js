@@ -10,6 +10,7 @@ export const getLlmStatus = () => api.get('/llm/status').then((r) => r.data)
 
 export const getScamSamples = () => api.get('/scam/samples').then((r) => r.data)
 export const getStats = () => api.get('/stats').then((r) => r.data)
+export const getNews = () => api.get('/news').then((r) => r.data)
 export const getFraudGraph = () => api.get('/fraud/graph').then((r) => r.data)
 export const getFraudPackages = () => api.get('/fraud/packages').then((r) => r.data)
 export const getCounterfeitFeatures = () =>

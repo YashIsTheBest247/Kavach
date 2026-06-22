@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
-  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X,
+  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X, Newspaper,
 } from 'lucide-react'
 import { Logo, ThemeToggle, LangToggle } from '../components/ui.jsx'
 import { useLang, t } from '../i18n.js'
@@ -17,6 +17,7 @@ const LINKS = [
   { to: '/console/fraud-shield', icon: PhoneCall, en: 'Citizen Fraud Shield', hi: 'नागरिक फ्रॉड शील्ड' },
   { to: '/console/crime-map', icon: MapPin, en: 'Crime Map', hi: 'क्राइम मैप' },
   { to: '/console/metrics', icon: Target, en: 'Measured Metrics', hi: 'मापे गए मेट्रिक्स' },
+  { to: '/console/news', icon: Newspaper, en: 'Scam News Watch', hi: 'घोटाला समाचार निगरानी' },
 ]
 
 export default function ConsoleLayout() {

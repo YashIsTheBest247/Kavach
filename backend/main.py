@@ -12,7 +12,7 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm, voice_engine, metrics, orchestrator
+from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm, voice_engine, metrics, orchestrator, news
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -53,6 +53,11 @@ def health():
 @app.get("/api/stats")
 def stats():
     return geo_stats.dashboard_stats()
+
+
+@app.get("/api/news")
+def news_feed():
+    return news.get_news()
 
 
 @app.get("/api/llm/status")
