@@ -12,7 +12,7 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm, voice_engine, metrics
+from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm, voice_engine, metrics, orchestrator
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -34,6 +34,14 @@ class ScamRequest(BaseModel):
     channel: Optional[str] = "Unknown"
     language: Optional[str] = "en"
     use_ai: Optional[bool] = False   # opt-in Gemini augmentation
+
+
+class FusionRequest(BaseModel):
+    text: str
+    channel: Optional[str] = "Phone Call"
+    language: Optional[str] = "en"
+    location: Optional[str] = None
+    phone: Optional[str] = None
 
 
 # ---------- meta ----------
@@ -110,6 +118,13 @@ async def counterfeit_screen(
     img_bytes = await file.read()
     feats: List[str] = [f for f in confirmed_features.split(",") if f]
     return counterfeit.screen_note(img_bytes, denomination, feats)
+
+
+# ---------- agentic fusion orchestrator ----------
+@app.post("/api/fusion/orchestrate")
+def fusion_orchestrate(req: FusionRequest):
+    return orchestrator.orchestrate(req.text, req.channel or "Unknown",
+                                    req.language or "en", req.location, req.phone)
 
 
 # ---------- voice-spoof / deepfake-voice ----------

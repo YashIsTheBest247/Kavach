@@ -32,4 +32,7 @@ export const analyzeVoice = (file) => {
 }
 export const getMetrics = () => api.get('/metrics').then((r) => r.data)
 
+export const orchestrateFusion = (payload) =>
+  api.post('/fusion/orchestrate', payload).then((r) => r.data)
+
 export default api

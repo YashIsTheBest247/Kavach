@@ -80,10 +80,10 @@ function MetricBlock({ data, highlight, highlightLabel }) {
         <div className="rounded-lg bg-ink-900 border border-white/8 p-4">
           <div className="text-xs text-gray-400 mb-2">Confusion matrix</div>
           <div className="grid grid-cols-2 gap-2 text-center text-sm">
-            <Cell label="True Positive" v={c.tp} good />
-            <Cell label="False Negative" v={c.fn} bad={c.fn > 0} />
-            <Cell label="False Positive" v={c.fp} bad={c.fp > 0} />
-            <Cell label="True Negative" v={c.tn} good />
+            <Cell label="True Positive" v={c.tp} />
+            <Cell label="False Negative" v={c.fn} />
+            <Cell label="False Positive" v={c.fp} />
+            <Cell label="True Negative" v={c.tn} />
           </div>
         </div>
       </div>
@@ -109,10 +109,10 @@ function MetricBlock({ data, highlight, highlightLabel }) {
   )
 }
 
-function Cell({ label, v, good, bad }) {
+function Cell({ label, v }) {
   return (
-    <div className={`rounded p-2 ${good ? 'bg-emerald-500/10' : bad ? 'bg-red-500/10' : 'bg-ink-700'}`}>
-      <div className={`font-display text-2xl font-700 ${good ? 'text-emerald-300' : bad ? 'text-red-300' : 'text-gray-300'}`}>{v}</div>
+    <div className="rounded p-2 bg-ink-700 border border-white/8">
+      <div className="font-display text-2xl font-700 text-gray-200">{v}</div>
       <div className="text-[10px] text-gray-500">{label}</div>
     </div>
   )

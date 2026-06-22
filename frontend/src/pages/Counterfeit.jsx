@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Upload, ScanLine, CheckCircle2, XCircle, Info } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
@@ -15,10 +15,18 @@ export default function Counterfeit() {
   const [res, setRes] = useState(null)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(null)
+  const resultRef = useRef(null)
 
   useEffect(() => {
     getCounterfeitFeatures().then((d) => setFeatures(d.features)).catch(() => {})
   }, [])
+
+  // Scroll to the result panel once a verdict is ready.
+  useEffect(() => {
+    if (res && !loading) {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [res, loading])
 
   const onFile = (f) => {
     if (!f) return
@@ -91,7 +99,7 @@ export default function Counterfeit() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div ref={resultRef} className="space-y-4 scroll-mt-24">
           {loading && <div className="rounded-xl border border-white/8 bg-ink-700 p-6"><Spinner label="Running forensics…" /></div>}
           {res && !loading && (
             <>

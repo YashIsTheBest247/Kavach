@@ -2,19 +2,19 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Play, ShieldCheck, Network, ScanLine, MessageSquareWarning, MapPin,
-  PhoneCall, ArrowRight, Zap, Lock, Globe, Mic, Target,
+  PhoneCall, ArrowRight, Mic, Target, Workflow,
 } from 'lucide-react'
 import { Logo, RiskBadge, ThemeToggle } from '../components/ui.jsx'
 import { analyzeScam } from '../api.js'
 
 const NAV = [
   { label: 'HOME', href: '#home' },
-  { label: 'THREAT BRIEF', href: '#brief' },
   { label: 'FEATURES', href: '#features' },
   { label: 'LIVE DEMO', href: '#demo' },
 ]
 
 const FEATURES = [
+  { icon: Workflow, title: 'Agentic Threat Fusion', desc: 'Cooperating agents correlate the scam, fraud ring and geo context, then auto-draft citizen, telecom and MHA-NCRP responses — one coordinated brain.', to: '/console/fusion' },
   { icon: MessageSquareWarning, title: 'Digital Arrest Detector', desc: 'Real-time classifier that flags fake-CBI / digital-arrest scripts before money moves — with an explainable evidence trail.', to: '/console/scam-detector' },
   { icon: Mic, title: 'Voice-Spoof Detection', desc: 'Explainable audio forensics that flags AI-cloned / synthetic voices used in scam calls — try it with built-in demo clips.', to: '/console/voice-spoof' },
   { icon: Network, title: 'Fraud Network Graph', desc: 'Clusters victims, mule accounts and spoofed numbers into coordinated rings and emits court-auditable intelligence packages.', to: '/console/fraud-graph' },
@@ -27,10 +27,9 @@ const FEATURES = [
 
 export default function Landing() {
   return (
-    <div id="home" className="min-h-screen bg-ink-900 text-gray-200">
+    <div id="home" className="min-h-screen bg-ink-900 text-gray-200 fade-in">
       <TopNav />
       <Hero />
-      <ThreatBrief />
       <LiveDemo />
       <Features />
       <Footer />
@@ -114,30 +113,6 @@ function Hero() {
   )
 }
 
-function ThreatBrief() {
-  return (
-    <section id="brief" className="border-y border-white/5 bg-ink-800">
-      <div className="mx-auto max-w-7xl px-5 py-16 grid md:grid-cols-3 gap-8">
-        {[
-          { icon: PhoneCall, t: 'Industrialised, not opportunistic', d: 'Scams run from cross-border compounds using spoofed numbers, AI voices and fake govt portals — far beyond what manual policing can track.' },
-          { icon: Lock, t: 'Intelligence before victimisation', d: 'Law enforcement does not lack evidence after the fact — it lacks detection at the point of contact, before the transfer happens.' },
-          { icon: Globe, t: 'Convergence is the answer', d: 'Financial, communication, physical (FICN) and geospatial signals fused into one auditable intelligence layer.' },
-        ].map((c) => (
-          <div key={c.t} className="flex gap-4">
-            <div className="shrink-0 grid place-items-center w-11 h-11 rounded-lg bg-brand/15 text-brand">
-              <c.icon size={20} />
-            </div>
-            <div>
-              <h3 className="font-display font-600 text-white text-lg">{c.t}</h3>
-              <p className="text-sm text-gray-400 mt-1 leading-relaxed">{c.d}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 const PRESET = "Sir I am Inspector from CBI. Your Aadhaar is linked to a money laundering case and there is an arrest warrant. You are under digital arrest — do not disconnect this video call and do not tell anyone. Transfer all your funds to this RBI verification account immediately to prove innocence, it is refundable."
 
 function LiveDemo() {
@@ -179,7 +154,7 @@ function LiveDemo() {
             <span className="text-xs text-gray-500">Tip: edit the preset to test your own message.</span>
             <button onClick={run} disabled={loading}
               className="inline-flex items-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-60 text-black font-700 px-6 py-2.5 rounded transition-colors">
-              <Zap size={16} /> {loading ? 'Analysing…' : 'Analyse threat'}
+              {loading ? 'Analysing…' : 'Analyse threat'}
             </button>
           </div>
 

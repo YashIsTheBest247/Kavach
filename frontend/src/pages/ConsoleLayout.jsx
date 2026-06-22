@@ -1,12 +1,13 @@
-import { NavLink, Outlet, Link } from 'react-router-dom'
+import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
-  PhoneCall, MapPin, ArrowLeft, Mic, Target,
+  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow,
 } from 'lucide-react'
 import { Logo, ThemeToggle } from '../components/ui.jsx'
 
 const LINKS = [
   { to: '/console', end: true, icon: LayoutDashboard, label: 'Command Dashboard' },
+  { to: '/console/fusion', icon: Workflow, label: 'Threat Fusion (Agentic)' },
   { to: '/console/scam-detector', icon: MessageSquareWarning, label: 'Digital Arrest Detector' },
   { to: '/console/voice-spoof', icon: Mic, label: 'Voice-Spoof Detection' },
   { to: '/console/fraud-graph', icon: Network, label: 'Fraud Network Graph' },
@@ -48,10 +49,19 @@ export default function ConsoleLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 min-w-0 overflow-x-hidden">
-        <Outlet />
-      </main>
+      <ConsoleMain />
     </div>
+  )
+}
+
+function ConsoleMain() {
+  const location = useLocation()
+  return (
+    <main className="flex-1 min-w-0 overflow-x-hidden">
+      <div key={location.pathname} className="page-enter">
+        <Outlet />
+      </div>
+    </main>
   )
 }
 

@@ -87,6 +87,23 @@ def _connected_components(nodes, edges):
     return comps
 
 
+def get_ring_context(ring_key: str) -> Dict:
+    """Return the infrastructure + victim impact for a given ring tag ('A','B')."""
+    nodes = [n for n in _SEED_NODES if ring_key in n["ring"]]
+    victims = [n for n in nodes if n["type"] == "victim"]
+    return {
+        "ring": ring_key,
+        "scammer_numbers": [n["label"] for n in nodes if n["type"] == "scammer_phone"],
+        "mule_accounts": [n["label"] for n in nodes if n["type"] == "mule_account"],
+        "voip_gateways": [n["label"] for n in nodes if n["type"] == "voip_gateway"],
+        "kingpins": [n["label"] for n in nodes if n["type"] == "kingpin"],
+        "victim_count": len(victims),
+        "reported_loss_inr": sum(v.get("loss", 0) for v in victims),
+        "jurisdictions": sorted({v["location"] for v in victims}),
+        "shared_infrastructure": any("SHARED" in n["id"] for n in nodes),
+    }
+
+
 def get_intelligence_packages() -> List[Dict]:
     """Cluster the graph into campaigns and emit an evidence package per ring."""
     g = get_graph()

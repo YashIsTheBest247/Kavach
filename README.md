@@ -11,10 +11,11 @@ Built with **React + FastAPI**.
 
 ---
 
-## ✨ What's inside (8 capabilities)
+## ✨ What's inside (9 capabilities)
 
 | Module | What it does | Maps to problem-statement bullet |
 |---|---|---|
+| **Agentic Threat Fusion** | An **orchestrator** that chains cooperating agents (Triage → escalation gate → Network-Correlation → Geo-Context → Response) so the modules act as one brain: on a high-risk scam it links the fraud ring, attaches geo context, computes a **fused threat score** and auto-drafts citizen + telecom + MHA-NCRP responses. Every agent step is auditable. | *Agentic AI for multi-source intelligence fusion* |
 | **Digital Arrest Detector** | Real-time, explainable classifier for scam scripts with an **auditable evidence trail** (every flagged phrase + tactic + weight). 11 tactic categories spanning digital-arrest, KYC/phishing, remote-access, prize/advance-fee, account-compromise. | *Digital Arrest Scam Detection & Alerting* |
 | **Voice-Spoof / Deepfake Detection** | Explainable audio forensics that flags AI-cloned / synthetic voices used in scam calls; ships **built-in labelled demo clips** (synthetic vs human) so it's demoable without audio files. | *Speech AI (voice spoofing & AI-voice detection)* |
 | **Fraud Network Graph** | Clusters victims, mule accounts, spoofed numbers & devices into coordinated rings; emits **intelligence packages** and detects shared infrastructure linking campaigns. | *Fraud Network Graph Intelligence* |
@@ -74,6 +75,7 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
            ├── geo_stats.py       hotspot geodata + dashboard metrics
            ├── voice_engine.py    audio forensics + labelled demo-clip generation (numpy)
            ├── metrics.py         labelled eval sets → precision/recall/FP/FN
+           ├── orchestrator.py    agentic fusion chain (triage→correlate→geo→respond)
            └── llm.py             optional Gemini augmentation (graceful fallback)
 ```
 
@@ -113,6 +115,7 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 | POST | `/api/voice/analyze` | screen an uploaded WAV for synthetic/AI voice |
 | GET | `/api/voice/demo?kind=synthetic\|human` | generate + screen a labelled demo clip (returns audio) |
 | GET | `/api/metrics` | measured precision/recall/FP/FN on labelled sets |
+| POST | `/api/fusion/orchestrate` | run the agentic fusion chain → trace + fused score + drafted response |
 | GET | `/api/geo/hotspots` | geospatial crime hotspots |
 
 ---

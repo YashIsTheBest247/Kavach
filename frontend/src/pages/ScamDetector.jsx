@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Zap, FileText, ShieldAlert, ListChecks, Languages, Sparkles } from 'lucide-react'
+import { FileText, ShieldAlert, ListChecks, Languages, Sparkles } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
-import { RiskBadge, Spinner } from '../components/ui.jsx'
+import { RiskBadge, Spinner, Select } from '../components/ui.jsx'
 import { analyzeScam, getScamSamples, getLlmStatus } from '../api.js'
 
 const LANGS = [
@@ -30,7 +30,7 @@ function Highlighted({ text, spans }) {
   return <p className="whitespace-pre-wrap leading-relaxed">{out}</p>
 }
 
-export default function AIPanel({ ai }) {
+function AIPanel({ ai }) {
   if (!ai.available) {
     return (
       <div className="rounded-xl border border-white/8 bg-ink-700 p-5 text-sm text-gray-400 flex items-start gap-3">
@@ -80,7 +80,7 @@ export default function AIPanel({ ai }) {
   )
 }
 
-function ScamDetector() {
+export default function ScamDetector() {
   const [samples, setSamples] = useState([])
   const [text, setText] = useState('')
   const [channel, setChannel] = useState('Video Call')
@@ -126,17 +126,12 @@ function ScamDetector() {
             <div className="grid grid-cols-2 gap-3 mt-4">
               <div>
                 <label className="text-xs text-gray-500">Channel</label>
-                <select value={channel} onChange={(e) => setChannel(e.target.value)}
-                  className="w-full mt-1 bg-ink-900 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
-                  {CHANNELS.map((c) => <option key={c}>{c}</option>)}
-                </select>
+                <Select className="mt-1" value={channel} onChange={setChannel} options={CHANNELS} />
               </div>
               <div>
                 <label className="text-xs text-gray-500 flex items-center gap-1"><Languages size={12} /> Advisory language</label>
-                <select value={language} onChange={(e) => setLanguage(e.target.value)}
-                  className="w-full mt-1 bg-ink-900 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand">
-                  {LANGS.map(([c, n]) => <option key={c} value={c}>{n}</option>)}
-                </select>
+                <Select className="mt-1" value={language} onChange={setLanguage}
+                  options={LANGS.map(([c, n]) => ({ value: c, label: n }))} />
               </div>
             </div>
 
@@ -153,7 +148,7 @@ function ScamDetector() {
 
             <button onClick={run} disabled={loading}
               className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-60 text-black font-700 py-3 rounded transition-colors">
-              <Zap size={16} /> {loading ? 'Analysing…' : 'Analyse threat'}
+              {loading ? 'Analysing…' : 'Analyse threat'}
             </button>
           </div>
 

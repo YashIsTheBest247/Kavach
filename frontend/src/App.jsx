@@ -9,6 +9,7 @@ import FraudShield from './pages/FraudShield.jsx'
 import CrimeMap from './pages/CrimeMap.jsx'
 import VoiceSpoof from './pages/VoiceSpoof.jsx'
 import Metrics from './pages/Metrics.jsx'
+import FusionOrchestrator from './pages/FusionOrchestrator.jsx'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/console" element={<ConsoleLayout />}>
         <Route index element={<Dashboard />} />
+        <Route path="fusion" element={<FusionOrchestrator />} />
         <Route path="scam-detector" element={<ScamDetector />} />
         <Route path="fraud-graph" element={<FraudGraph />} />
         <Route path="counterfeit" element={<Counterfeit />} />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Mic, Upload, Waves, Bot, User, Volume2, Info } from 'lucide-react'
+import { Mic, Upload, Waves, Volume2, Info } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
 import { voiceDemo, analyzeVoice } from '../api.js'
@@ -47,12 +47,12 @@ export default function VoiceSpoof() {
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button onClick={() => runDemo('synthetic')} disabled={loading}
-                className="flex items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 py-3 hover:border-red-500/60 transition-colors disabled:opacity-60">
-                <Bot size={18} /> Synthetic / AI voice
+                className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-ink-900 text-gray-300 py-3 hover:border-brand/50 hover:text-white transition-colors disabled:opacity-60">
+                Synthetic / AI voice
               </button>
               <button onClick={() => runDemo('human')} disabled={loading}
-                className="flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 py-3 hover:border-emerald-500/60 transition-colors disabled:opacity-60">
-                <User size={18} /> Human voice
+                className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-ink-900 text-gray-300 py-3 hover:border-brand/50 hover:text-white transition-colors disabled:opacity-60">
+                Human voice
               </button>
             </div>
           </div>

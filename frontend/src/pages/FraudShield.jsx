@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Bot, User, ShieldCheck, Phone } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
-import { RiskBadge } from '../components/ui.jsx'
+import { RiskBadge, Select } from '../components/ui.jsx'
 import { analyzeScam } from '../api.js'
 
 const LANGS = [
@@ -57,10 +57,8 @@ export default function FraudShield() {
                 <div className="text-[11px] text-emerald-400">● online · helpline 1930</div>
               </div>
             </div>
-            <select value={lang} onChange={(e) => setLang(e.target.value)}
-              className="bg-ink-900 border border-white/10 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-brand">
-              {LANGS.map(([c, n]) => <option key={c} value={c}>{n}</option>)}
-            </select>
+            <Select value={lang} onChange={setLang} className="w-36"
+              options={LANGS.map(([c, n]) => ({ value: c, label: n }))} />
           </div>
 
           {/* messages */}

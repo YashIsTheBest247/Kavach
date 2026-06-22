@@ -1,5 +1,50 @@
-import { Shield, Sun, Moon } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Shield, Sun, Moon, ChevronDown, Check } from 'lucide-react'
 import { useTheme, toggleTheme } from '../theme.js'
+
+/**
+ * Custom dropdown — fully themed (curved, brand highlight, no native blue).
+ * options: array of { value, label } or plain strings.
+ */
+export function Select({ value, onChange, options, className = '' }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+  const norm = options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o))
+  const current = norm.find((o) => o.value === value) || norm[0]
+
+  useEffect(() => {
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', onDoc)
+    return () => document.removeEventListener('mousedown', onDoc)
+  }, [])
+
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between gap-2 bg-ink-900 border border-ink-500 rounded-xl px-3 py-2 text-sm text-gray-200 hover:border-brand/50 focus:outline-none focus:border-brand transition-colors">
+        <span className="truncate">{current?.label}</span>
+        <ChevronDown size={16} className={`text-gray-500 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute z-30 mt-1.5 w-full rounded-xl border border-ink-500 bg-ink-700 shadow-xl overflow-hidden py-1 max-h-64 overflow-y-auto">
+          {norm.map((o) => {
+            const active = o.value === value
+            return (
+              <button key={o.value} type="button"
+                onClick={() => { onChange(o.value); setOpen(false) }}
+                className={`w-full flex items-center justify-between gap-2 text-left px-3 py-2 text-sm transition-colors ${
+                  active ? 'bg-brand/15 text-brand font-600' : 'text-gray-300 hover:bg-brand/10 hover:text-white'
+                }`}>
+                <span className="truncate">{o.label}</span>
+                {active && <Check size={15} className="shrink-0" />}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function ThemeToggle({ className = '' }) {
   const theme = useTheme()
@@ -31,20 +76,19 @@ export function Logo({ size = 'md' }) {
 }
 
 const LEVEL_STYLES = {
-  CRITICAL: 'bg-red-500/15 text-red-400 border-red-500/40',
-  HIGH: 'bg-orange-500/15 text-orange-400 border-orange-500/40',
-  MEDIUM: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40',
-  LOW: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40',
+  CRITICAL: 'bg-red-500/10 text-red-400 border-red-500/30',
+  HIGH: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
+  MEDIUM: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30',
+  LOW: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
 }
 
 export function RiskBadge({ level, className = '' }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-700 tracking-wide font-display ${
+      className={`inline-flex items-center px-2.5 py-0.5 rounded border text-[11px] font-600 uppercase tracking-wider ${
         LEVEL_STYLES[level] || LEVEL_STYLES.LOW
       } ${className}`}
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-current" />
       {level}
     </span>
   )
