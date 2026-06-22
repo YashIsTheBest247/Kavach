@@ -73,7 +73,9 @@ export default function ConsoleLayout() {
             <ArrowLeft size={14} /> {t('Back to site', 'साइट पर वापस')}
           </Link>
           <div className="px-3 mt-2 text-[10px] text-gray-600">
-            {t('Helpline', 'हेल्पलाइन')} <span className="text-brand">1930</span> · cybercrime.gov.in
+            {t('Helpline', 'हेल्पलाइन')}{' '}
+            <a href="tel:1930" className="text-brand hover:underline">1930</a> ·{' '}
+            <a href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="hover:text-brand hover:underline">cybercrime.gov.in</a>
           </div>
         </div>
       </aside>

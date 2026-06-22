@@ -7,11 +7,13 @@ to **predictive threat neutralisation** — detecting digital-arrest scams *befo
 mapping fraud networks into court-auditable intelligence packages, screening counterfeit
 currency at the point of contact, and shielding citizens in 6 Indian languages.
 
-Built with **React + FastAPI**.
+Built with **React + FastAPI**. The detection engine works on **English, Hinglish and Hindi**
+input, the entire UI is **bilingual (English / हिन्दी)** with a live toggle, ships **light & dark
+themes**, is fully **responsive**, and carries a live **Economic Times scam-news** ticker + feed.
 
 ---
 
-## ✨ What's inside (9 capabilities)
+## ✨ What's inside (10 capabilities)
 
 | Module | What it does | Maps to problem-statement bullet |
 |---|---|---|
@@ -23,6 +25,7 @@ Built with **React + FastAPI**.
 | **Citizen Fraud Shield** | Multi-channel, **6-language** conversational assistant giving instant verdicts + guided reporting to 1930 / cybercrime.gov.in. | *Citizen Fraud Shield (Multi-channel)* |
 | **Geospatial Crime Map** | Live hotspot map of fraud complaints & FICN seizures for patrol prioritisation. | *Geospatial Crime Pattern Intelligence* |
 | **Measured Metrics** | Detectors evaluated on **labelled hold-out sets** → precision / recall / F1 / accuracy + the safety-critical **false-positive & false-negative** rates, with confusion matrices. | *Evaluation Focus (precision/recall, very-low FP)* |
+| **Scam News Watch** | Live fraud/cyber-scam/counterfeit coverage from **Economic Times RSS** (keyword-filtered, cached, curated fallback) — plus a scrolling ticker on the landing page. | Situational awareness / threat context |
 | **Command Dashboard** | Unified situational picture: detection volumes, rings tracked, ₹ protected, latency, FP rate. | Cross-cutting fusion layer |
 
 ### 📊 Measured performance (on the bundled labelled sets — reproducible at `/console/metrics`)
@@ -35,7 +38,14 @@ Built with **React + FastAPI**.
 ### Why the detection engine wins on the rubric
 - **Explainable & auditable** — not a black box. Every verdict ships a signal log (matched text, tactic, weight) → defensible for *legal admissibility* (an explicit evaluation focus).
 - **Compound-tactic scoring** — the lethal combo (authority impersonation + false accusation + money demand) is boosted, mirroring how real digital-arrest scams escalate.
-- **Low false-positive design** — "safe signals" (e.g. *"visit your nearest branch"*) pull the score down; the rubric demands a *very low* citizen false-positive rate.
+- **Low false-positive design** — "safe signals" (e.g. *"visit your nearest branch"* / *"ओटीपी किसी को मत बताएं"*) pull the score down; the rubric demands a *very low* citizen false-positive rate.
+- **Multilingual detection** — Devanagari Hindi + Hinglish patterns alongside English, so a scam typed in Hindi still scores correctly (verified: Hindi scam → CRITICAL, Hindi legit → LOW, English metrics unchanged).
+
+### 🎨 Platform UX
+- **Bilingual UI** — English / हिन्दी toggle (in the navbar & every page header) switches all static UI live; citizen advisories render in **6 Indian languages**.
+- **Light & dark themes** — CSS-variable-driven, live toggle, no flash; graph/map/charts adapt.
+- **Responsive** — mobile drawer sidebar, adaptive layouts, animated route transitions.
+- **Live ET ticker** — scrolling scam-news headlines across the top of the landing page.
 
 ---
 
@@ -77,11 +87,13 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
            ├── voice_engine.py    audio forensics + labelled demo-clip generation (numpy)
            ├── metrics.py         labelled eval sets → precision/recall/FP/FN
            ├── orchestrator.py    agentic fusion chain (triage→correlate→geo→respond)
+           ├── news.py            Economic Times RSS fetch + filter + cache + fallback
            └── llm.py             optional Gemini augmentation (graceful fallback)
 ```
 
-- **Frontend:** React 18, React Router, Tailwind (dark/orange theme), Recharts (dashboard),
+- **Frontend:** React 18, React Router, Tailwind (CSS-variable theming), Recharts (dashboard),
   `react-force-graph-2d` (network graph), React-Leaflet (crime map), Lucide icons.
+  Lightweight stores for **theme** (`theme.js`) and **language** (`i18n.js`).
 - **Backend:** FastAPI, Pydantic, Pillow. Pure-Python, deterministic engines → reliable demo,
   no API keys required.
 - **AI layer (optional):** **Google Gemini** (`gemini-2.5-flash` via `google-genai`) augments
@@ -123,14 +135,26 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 ---
 
 ## 🎬 Suggested demo flow (for judges)
-1. **Landing → "Analyse threat"** on the preset fake-CBI message → instant CRITICAL verdict.
-2. **Console → Digital Arrest Detector** → load *"Fake CBI Digital Arrest"* sample → show highlighted
-   evidence, tactic breakdown, auditable signal log, and switch advisory to **हिन्दी**.
-3. Run the **"Genuine bank reminder"** sample → scores LOW (proves low false-positive design).
-4. **Fraud Network Graph** → point out the **shared mule account** linking Ring A & B → "this is one network".
-5. **Counterfeit Screen** → upload a note, untick features → risk jumps; tick them → drops.
-6. **Citizen Fraud Shield** → chat a scam in a regional language.
-7. **Crime Map** → hotspot bubbles for patrol prioritisation.
+1. **Landing** → note the live **ET scam-news ticker** on top → click **"Load test phrase" → "Analyse threat"** → instant CRITICAL verdict. Flip the **EN/हिं** toggle to show the bilingual UI, and the **theme** toggle for light/dark.
+2. **Threat Fusion (Agentic)** → run orchestration → watch the agent chain (Triage → gate → Correlate → Geo → Response) link the fraud ring, attach geo, and auto-draft the MHA-NCRP report.
+3. **Digital Arrest Detector** → load a sample → show highlighted evidence, tactic breakdown, auditable signal log; switch advisory to **हिन्दी**; then **type a scam in Hindi** → still CRITICAL.
+4. Run the **"Genuine bank reminder"** sample → scores LOW (proves low false-positive design).
+5. **Voice-Spoof Detection** → click the **Synthetic / Human** demo clips → plays + screens with a verdict.
+6. **Fraud Network Graph** → point out the **shared mule account** linking the rings → "this is one network".
+7. **Counterfeit Screen** → upload a note, untick features → risk jumps; tick them → drops.
+8. **Measured Metrics** → show real precision/recall + 0% false-positive (scam) / 0% false-negative (voice).
+9. **Crime Map** & **Scam News Watch** → hotspots for patrol prioritisation + live ET threat coverage.
+
+---
+
+## ⚠️ Honesty notes (scope & limitations)
+- **Counterfeit screening** is an explainable MVP (phone-photo forensics + security-feature checklist), **not** a UV/IR-hardware + trained-CNN system — clearly disclaimed in-app; high-quality fakes are the measured 20% false-negatives.
+- **Voice-spoof** is heuristic audio forensics, not an ASVspoof-grade model; it ships labelled demo clips so the metric is real and reproducible.
+- **Fraud-graph & geo data** are realistic **synthetic** datasets modelled on NCRP/RBI reporting patterns — swap in live UPI/CDR/NCRP feeds in production.
+- **News** is live ET RSS, keyword-filtered; when ET has no fresh consumer-scam stories (or is unreachable) it shows curated fallback headlines, flagged in the UI.
+- **Bilingual UI**: all static UI + citizen advisories switch to Hindi. Some **engine-generated prose** (verdict summaries, factor descriptions, fraud-graph findings) is still emitted in English and would need a backend-localization pass for 100% Hindi.
+
+Helpline **1930** · **cybercrime.gov.in**
 
 ---
 

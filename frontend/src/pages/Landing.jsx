@@ -259,7 +259,9 @@ function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
         <Logo />
         <p className="text-xs text-gray-500 text-center">
-          {t('Helpline', 'हेल्पलाइन')} <span className="text-brand font-600">1930</span> · cybercrime.gov.in
+          {t('Helpline', 'हेल्पलाइन')}{' '}
+          <a href="tel:1930" className="text-brand font-600 hover:underline">1930</a> ·{' '}
+          <a href="https://cybercrime.gov.in" target="_blank" rel="noreferrer" className="hover:text-brand hover:underline">cybercrime.gov.in</a>
         </p>
       </div>
     </footer>
