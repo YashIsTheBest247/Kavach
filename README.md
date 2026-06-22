@@ -13,7 +13,7 @@ themes**, is fully **responsive**, and carries a live **Economic Times scam-news
 
 ---
 
-## ✨ What's inside (10 capabilities)
+##  What's inside (10 capabilities)
 
 | Module | What it does | Maps to problem-statement bullet |
 |---|---|---|
@@ -35,12 +35,6 @@ themes**, is fully **responsive**, and carries a live **Economic Times scam-news
 | **Voice-Spoof / Deepfake** (n=40) | 90.0% | 83.3% | 100% | 90.9% | 20% | **0%** (no deepfake missed) |
 | **Counterfeit / FICN** (n=30) | 90.0% | 100% | 80.0% | 88.9% | **0%** | 20% (crude fakes caught; high-quality fakes need UV/IR) |
 
-### Why the detection engine wins on the rubric
-- **Explainable & auditable** — not a black box. Every verdict ships a signal log (matched text, tactic, weight) → defensible for *legal admissibility* (an explicit evaluation focus).
-- **Compound-tactic scoring** — the lethal combo (authority impersonation + false accusation + money demand) is boosted, mirroring how real digital-arrest scams escalate.
-- **Low false-positive design** — "safe signals" (e.g. *"visit your nearest branch"* / *"ओटीपी किसी को मत बताएं"*) pull the score down; the rubric demands a *very low* citizen false-positive rate.
-- **Multilingual detection** — Devanagari Hindi + Hinglish patterns alongside English, so a scam typed in Hindi still scores correctly (verified: Hindi scam → CRITICAL, Hindi legit → LOW, English metrics unchanged).
-
 ### 🎨 Platform UX
 - **Bilingual UI** — English / हिन्दी toggle (in the navbar & every page header) switches all static UI live; citizen advisories render in **6 Indian languages**.
 - **Light & dark themes** — CSS-variable-driven, live toggle, no flash; graph/map/charts adapt.
@@ -49,7 +43,7 @@ themes**, is fully **responsive**, and carries a live **Economic Times scam-news
 
 ---
 
-## 🚀 Run it (2 terminals)
+## Run it (2 terminals)
 
 ### 1. Backend — FastAPI (port 8000)
 ```bash
@@ -101,7 +95,7 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
   of the rule engine and **degrades gracefully** — no `GEMINI_API_KEY` ⇒ the platform runs on the
   deterministic engine alone, so the demo never breaks.
 
-### 🤖 Enabling Gemini
+### Enabling Gemini
 ```bash
 cd backend
 cp .env.example .env        # then edit .env
@@ -113,7 +107,7 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 
 ---
 
-## 🔌 API surface
+## API surface
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/api/health` | health check |
@@ -132,22 +126,10 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 | POST | `/api/fusion/orchestrate` | run the agentic fusion chain → trace + fused score + drafted response |
 | GET | `/api/geo/hotspots` | geospatial crime hotspots |
 
----
-
-## 🎬 Suggested demo flow (for judges)
-1. **Landing** → note the live **ET scam-news ticker** on top → click **"Load test phrase" → "Analyse threat"** → instant CRITICAL verdict. Flip the **EN/हिं** toggle to show the bilingual UI, and the **theme** toggle for light/dark.
-2. **Threat Fusion (Agentic)** → run orchestration → watch the agent chain (Triage → gate → Correlate → Geo → Response) link the fraud ring, attach geo, and auto-draft the MHA-NCRP report.
-3. **Digital Arrest Detector** → load a sample → show highlighted evidence, tactic breakdown, auditable signal log; switch advisory to **हिन्दी**; then **type a scam in Hindi** → still CRITICAL.
-4. Run the **"Genuine bank reminder"** sample → scores LOW (proves low false-positive design).
-5. **Voice-Spoof Detection** → click the **Synthetic / Human** demo clips → plays + screens with a verdict.
-6. **Fraud Network Graph** → point out the **shared mule account** linking the rings → "this is one network".
-7. **Counterfeit Screen** → upload a note, untick features → risk jumps; tick them → drops.
-8. **Measured Metrics** → show real precision/recall + 0% false-positive (scam) / 0% false-negative (voice).
-9. **Crime Map** & **Scam News Watch** → hotspots for patrol prioritisation + live ET threat coverage.
 
 ---
 
-## ⚠️ Honesty notes (scope & limitations)
+## Scope 
 - **Counterfeit screening** is an explainable MVP (phone-photo forensics + security-feature checklist), **not** a UV/IR-hardware + trained-CNN system — clearly disclaimed in-app; high-quality fakes are the measured 20% false-negatives.
 - **Voice-spoof** is heuristic audio forensics, not an ASVspoof-grade model; it ships labelled demo clips so the metric is real and reproducible.
 - **Fraud-graph & geo data** are realistic **synthetic** datasets modelled on NCRP/RBI reporting patterns — swap in live UPI/CDR/NCRP feeds in production.
