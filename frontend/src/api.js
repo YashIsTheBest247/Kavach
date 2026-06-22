@@ -1,7 +1,8 @@
 import axios from 'axios'
 
-// In dev, Vite proxies /api -> http://localhost:8000
-const api = axios.create({ baseURL: '/api' })
+// Dev: Vite proxies /api -> http://localhost:8000 (see vite.config.js).
+// Prod: set VITE_API_URL to the deployed backend, e.g. https://kavach-api.onrender.com/api
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api' })
 
 export const analyzeScam = (text, channel, language, useAi = false) =>
   api.post('/scam/analyze', { text, channel, language, use_ai: useAi }).then((r) => r.data)

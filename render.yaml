@@ -1,0 +1,19 @@
+# Render Blueprint — backend API (frontend is deployed separately on Vercel).
+# In Render: New → Blueprint → pick this repo. It reads this file from the repo root.
+services:
+  - type: web
+    name: kavach-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      # Optional — enables the Gemini AI layer. Leave unset to run on the
+      # deterministic engine alone. Set the value in the Render dashboard.
+      - key: GEMINI_API_KEY
+        sync: false
