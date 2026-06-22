@@ -12,7 +12,6 @@ const NAV = [
   { label: 'THREAT BRIEF', href: '#brief' },
   { label: 'FEATURES', href: '#features' },
   { label: 'LIVE DEMO', href: '#demo' },
-  { label: 'TECH', href: '#tech' },
 ]
 
 const FEATURES = [
@@ -32,7 +31,6 @@ export default function Landing() {
       <ThreatBrief />
       <LiveDemo />
       <Features />
-      <TechStack />
       <Footer />
     </div>
   )
@@ -65,20 +63,20 @@ function Hero() {
     <section className="relative hero-bokeh overflow-hidden">
       <div className="absolute inset-0 diag-stripes" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink-900" />
-      <div className="relative mx-auto max-w-7xl px-5 py-24 md:py-32 text-center">
-        <div className="text-gray-300 text-sm md:text-base tracking-[0.25em] uppercase mb-4">
+      <div className="relative mx-auto max-w-6xl px-5 py-10 md:py-12 text-center">
+        <div className="text-gray-400 text-xs md:text-sm tracking-[0.2em] uppercase mb-3">
           ₹1,776 crore stolen in 9 months. The data existed. The defence did not.
         </div>
-        <h1 className="font-display font-700 uppercase leading-[0.95] text-white text-5xl md:text-7xl">
+        <h1 className="font-display font-700 uppercase leading-[0.92] text-white text-4xl md:text-5xl">
           Can you spot a scam<br />
           <span className="text-brand">before it steals everything?</span>
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-gray-400 text-sm md:text-base leading-relaxed">
+        <p className="mx-auto mt-4 max-w-2xl text-gray-400 text-sm md:text-[15px] leading-relaxed">
           Kavach AI is a Digital Public Safety Intelligence platform that detects digital-arrest
           scams, maps fraud networks, screens counterfeit currency and shields citizens — shifting
           law enforcement from reactive investigation to predictive threat neutralisation.
         </p>
-        <div className="mt-9 flex items-center justify-center gap-4 flex-wrap">
+        <div className="mt-6 flex items-center justify-center gap-4 flex-wrap">
           <Link to="/console"
             className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-600 text-black font-700 px-7 py-3.5 rounded transition-colors shadow-glow">
             ENTER COMMAND CENTRE
@@ -93,14 +91,14 @@ function Hero() {
           </a>
         </div>
 
-        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-xl overflow-hidden border border-white/5">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 rounded-xl overflow-hidden border border-white/5">
           {[
             ['1.14M', 'Cybercrime complaints, 2023'],
             ['+60%', 'YoY growth in complaints'],
             ['₹1,776 Cr', 'Digital-arrest loss (9m 2024)'],
             ['38 ms', 'Avg. detection latency'],
           ].map(([v, l]) => (
-            <div key={l} className="bg-ink-800 px-4 py-6">
+            <div key={l} className="bg-ink-800 px-4 py-5">
               <div className="font-display text-3xl font-700 text-brand">{v}</div>
               <div className="text-[11px] text-gray-400 mt-1 leading-tight">{l}</div>
             </div>
@@ -234,22 +232,6 @@ function Features() {
                 Open tool <ArrowRight size={15} />
               </div>
             </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function TechStack() {
-  const items = ['Google Gemini', 'Computer Vision', 'Graph AI & Network Analysis', 'NLP / LLM Classification', 'Geospatial Intelligence', 'Speech & Voice-spoof Detection', 'Agentic Multi-source Fusion']
-  return (
-    <section id="tech" className="bg-ink-900">
-      <div className="mx-auto max-w-7xl px-5 py-16 text-center">
-        <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-6">Built with</div>
-        <div className="flex flex-wrap justify-center gap-3">
-          {items.map((t) => (
-            <span key={t} className="text-sm text-gray-300 border border-white/10 bg-ink-700 px-4 py-2 rounded-full">{t}</span>
           ))}
         </div>
       </div>
