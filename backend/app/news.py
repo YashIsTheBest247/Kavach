@@ -17,8 +17,9 @@ from xml.etree import ElementTree as ET
 # Economic Times public RSS feeds most likely to carry consumer scam/fraud
 # coverage (kept narrow to avoid corporate/market 'fraud' noise).
 FEEDS = [
-    "https://economictimes.indiatimes.com/wealth/rssfeeds/837555174.cms",   # ET Wealth (personal finance/scams)
-    "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",      # ET Tech (cyber/AI/deepfake)
+    "https://economictimes.indiatimes.com/wealth/rssfeeds/837555174.cms",                 # ET Wealth (personal finance/scams)
+    "https://economictimes.indiatimes.com/tech/rssfeeds/13357270.cms",                    # ET Tech (cyber/AI/deepfake)
+    "https://economictimes.indiatimes.com/industry/banking/finance/rssfeeds/13358319.cms",# ET Banking/Finance (FICN/fraud)
 ]
 
 # Word-boundary matcher (substring matching produced false positives like
@@ -101,30 +102,32 @@ def get_news(force: bool = False) -> Dict:
     return {"items": deduped, "live": live, "cached": False}
 
 
-# Bundled fallback (used only when ET is unreachable) — clearly representative.
+# Bundled fallback (used only when the live feed has no fresh scam stories).
+# Links point to Economic Times *topic* pages, which always resolve to a live
+# listing for that subject — so they never 404.
 _FALLBACK = [
     {"title": "‘Digital arrest’ scams: How fraudsters posing as CBI/ED officers trap victims",
-     "link": "https://economictimes.indiatimes.com/wealth/save/digital-arrest-scam",
+     "link": "https://economictimes.indiatimes.com/topic/digital-arrest-scam",
      "summary": "Fraudsters impersonate law-enforcement over video calls, fabricate money-laundering cases and coerce victims into transferring funds. RBI and MHA have issued repeated warnings.",
      "pubDate": "", "source": "Economic Times"},
     {"title": "Cyber fraud complaints surge; losses cross record highs as UPI scams spread",
-     "link": "https://economictimes.indiatimes.com/wealth/save/cyber-fraud-complaints",
+     "link": "https://economictimes.indiatimes.com/topic/cyber-fraud",
      "summary": "NCRP data shows a sharp rise in online financial fraud, with mule accounts and spoofed numbers powering organised rings.",
      "pubDate": "", "source": "Economic Times"},
     {"title": "RBI flags rise in counterfeit Rs 500 notes; banks asked to upgrade detection",
-     "link": "https://economictimes.indiatimes.com/industry/banking/finance/ficn",
+     "link": "https://economictimes.indiatimes.com/topic/fake-currency-notes",
      "summary": "Record FICN seizures prompt the central bank to push stronger note-authentication at the counter.",
      "pubDate": "", "source": "Economic Times"},
     {"title": "Beware fake KYC-update and OTP-sharing messages, warns government",
-     "link": "https://economictimes.indiatimes.com/wealth/save/kyc-otp-fraud",
+     "link": "https://economictimes.indiatimes.com/topic/kyc-fraud",
      "summary": "Phishing links posing as bank KYC updates steal credentials; never share OTP, PIN or CVV.",
      "pubDate": "", "source": "Economic Times"},
     {"title": "AI voice-cloning used in new wave of impersonation scam calls",
-     "link": "https://economictimes.indiatimes.com/tech/technology/ai-voice-scam",
+     "link": "https://economictimes.indiatimes.com/topic/deepfake",
      "summary": "Scammers clone relatives’ and officials’ voices to add credibility to fraud calls, raising detection challenges.",
      "pubDate": "", "source": "Economic Times"},
     {"title": "How to report cyber fraud: 1930 helpline and cybercrime.gov.in explained",
-     "link": "https://economictimes.indiatimes.com/wealth/save/report-cyber-fraud",
+     "link": "https://economictimes.indiatimes.com/topic/cybercrime",
      "summary": "Acting within the ‘golden hour’ improves chances of freezing fraudulent transfers.",
      "pubDate": "", "source": "Economic Times"},
 ]
