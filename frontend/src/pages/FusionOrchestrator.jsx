@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-  Workflow, Cpu, ShieldAlert, Network, MapPin, FileText, ChevronRight,
-  CheckCircle2, CircleSlash, Building2, Phone, Scale, ListChecks,
+  Workflow, Cpu, ShieldAlert, Network, MapPin, FileText,
+  CircleSlash, Building2, Phone, Scale, ListChecks,
 } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner, Select } from '../components/ui.jsx'
@@ -62,7 +62,7 @@ export default function FusionOrchestrator() {
     <>
       <PageHeader title="Threat Fusion" accent="Orchestrator"
         subtitle="Agentic multi-source fusion — cooperating agents correlate the scam, fraud ring, geo context & draft the response" />
-      <div className="p-8 grid lg:grid-cols-2 gap-6">
+      <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
@@ -97,7 +97,6 @@ export default function FusionOrchestrator() {
                   <div key={a} className="flex items-center gap-2">
                     <span className="text-gray-600 font-mono text-xs w-4">{i + 1}</span>
                     <Icon size={15} className="text-brand" /> {a}
-                    {i < 4 && <ChevronRight size={13} className="text-gray-700 ml-auto" />}
                   </div>
                 )
               })}

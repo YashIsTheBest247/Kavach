@@ -16,7 +16,7 @@ export default function Metrics() {
     <>
       <PageHeader title="Measured" accent="Metrics"
         subtitle="Detectors evaluated on labelled hold-out sets — the numbers that actually save lives" />
-      <div className="p-8 space-y-8">
+      <div className="p-4 md:p-8 space-y-8">
         {err && <p className="text-red-400">{err}</p>}
         {!m && !err && <Spinner label="Running evaluation…" />}
         {m && (

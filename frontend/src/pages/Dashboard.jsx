@@ -31,7 +31,7 @@ export default function Dashboard() {
     <>
       <PageHeader title="Command" accent="Dashboard"
         subtitle="Unified situational picture across all detection surfaces" />
-      <div className="p-8 space-y-8">
+      <div className="p-4 md:p-8 space-y-8">
         {/* national context banner */}
         <div className="rounded-xl border border-brand/30 bg-gradient-to-r from-brand/10 to-transparent p-5 flex items-start gap-3">
           <AlertTriangle className="text-brand shrink-0 mt-0.5" size={20} />
@@ -107,7 +107,7 @@ function Wrap({ children }) {
   return (
     <>
       <PageHeader title="Command" accent="Dashboard" />
-      <div className="p-8">{children}</div>
+      <div className="p-4 md:p-8">{children}</div>
     </>
   )
 }

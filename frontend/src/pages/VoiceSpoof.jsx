@@ -35,7 +35,7 @@ export default function VoiceSpoof() {
     <>
       <PageHeader title="Voice-Spoof" accent="& Deepfake Detection"
         subtitle="Explainable audio forensics that flags synthetic / AI-cloned voices used in scam calls" />
-      <div className="p-8 grid lg:grid-cols-2 gap-6">
+      <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">

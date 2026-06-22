@@ -55,7 +55,7 @@ export default function FraudGraph() {
     <>
       <PageHeader title="Fraud Network" accent="Graph Intelligence"
         subtitle="Clusters victims, mule accounts and spoofed numbers into coordinated rings" />
-      <div className="p-8 grid lg:grid-cols-3 gap-6">
+      <div className="p-4 md:p-8 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-xl border border-white/8 bg-ink-700 overflow-hidden">
           <div className="px-5 py-3 border-b border-white/8 flex items-center justify-between flex-wrap gap-2">
             <h3 className="font-display font-600 text-white flex items-center gap-2">

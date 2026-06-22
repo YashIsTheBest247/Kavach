@@ -110,7 +110,7 @@ export default function ScamDetector() {
     <>
       <PageHeader title="Digital Arrest" accent="Detector"
         subtitle="Real-time, explainable classification of scam scripts — with an auditable evidence trail" />
-      <div className="p-8 grid lg:grid-cols-2 gap-6">
+      <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">

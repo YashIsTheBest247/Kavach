@@ -50,7 +50,7 @@ export default function Counterfeit() {
     <>
       <PageHeader title="Counterfeit Currency" accent="Screening"
         subtitle="Explainable image-forensics + security-feature checklist for FICN screening at point of contact" />
-      <div className="p-8 grid lg:grid-cols-2 gap-6">
+      <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
             <label className="text-sm font-600 text-gray-300">Denomination</label>

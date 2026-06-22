@@ -28,7 +28,7 @@ export default function CrimeMap() {
     <>
       <PageHeader title="Geospatial" accent="Crime Map"
         subtitle="Fraud complaint & FICN-seizure hotspots for patrol prioritisation and inter-district sharing" />
-      <div className="p-8 grid lg:grid-cols-3 gap-6">
+      <div className="p-4 md:p-8 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-xl border border-white/8 bg-ink-700 overflow-hidden">
           <div className="px-5 py-3 border-b border-white/8 flex items-center gap-2">
             <MapPin size={18} className="text-brand" />

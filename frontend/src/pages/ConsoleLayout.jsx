@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
-  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow,
+  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X,
 } from 'lucide-react'
 import { Logo, ThemeToggle } from '../components/ui.jsx'
 
@@ -18,15 +19,39 @@ const LINKS = [
 ]
 
 export default function ConsoleLayout() {
+  const [open, setOpen] = useState(false)
+
   return (
-    <div className="min-h-screen bg-ink-900 flex">
-      <aside className="w-64 shrink-0 border-r border-white/5 bg-ink-800 flex flex-col sticky top-0 h-screen">
-        <div className="px-5 h-16 flex items-center border-b border-white/5">
-          <Link to="/"><Logo /></Link>
+    <div className="min-h-screen bg-ink-900 lg:flex">
+      {/* mobile top bar */}
+      <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-white/5 bg-ink-800">
+        <Link to="/"><Logo /></Link>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button onClick={() => setOpen(true)} aria-label="Open menu"
+            className="grid place-items-center w-9 h-9 rounded-lg border border-white/10 text-gray-300 hover:text-brand hover:border-brand/50">
+            <Menu size={18} />
+          </button>
         </div>
-        <nav className="flex-1 p-3 space-y-1">
+      </div>
+
+      {/* backdrop (mobile only) */}
+      {open && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setOpen(false)} />}
+
+      {/* sidebar: drawer on mobile, static on desktop */}
+      <aside className={`fixed lg:sticky top-0 left-0 z-50 w-64 shrink-0 h-screen border-r border-white/5 bg-ink-800 flex flex-col
+                         transform transition-transform duration-300 lg:translate-x-0
+                         ${open ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="px-5 h-16 flex items-center justify-between border-b border-white/5">
+          <Link to="/" onClick={() => setOpen(false)}><Logo /></Link>
+          <button onClick={() => setOpen(false)} aria-label="Close menu"
+            className="lg:hidden text-gray-400 hover:text-brand">
+            <X size={20} />
+          </button>
+        </div>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {LINKS.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.end}
+            <NavLink key={l.to} to={l.to} end={l.end} onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
@@ -67,14 +92,14 @@ function ConsoleMain() {
 
 export function PageHeader({ title, subtitle, accent }) {
   return (
-    <div className="border-b border-white/5 bg-ink-800/60 px-8 py-6 flex items-start justify-between gap-4">
+    <div className="border-b border-white/5 bg-ink-800/60 px-4 md:px-8 py-5 md:py-6 flex items-start justify-between gap-4">
       <div>
-        <h1 className="font-display text-2xl font-700 uppercase text-white">
+        <h1 className="font-display text-xl md:text-2xl font-700 uppercase text-white">
           {title} {accent && <span className="text-brand">{accent}</span>}
         </h1>
-        {subtitle && <p className="text-sm text-gray-400 mt-1">{subtitle}</p>}
+        {subtitle && <p className="text-xs md:text-sm text-gray-400 mt-1">{subtitle}</p>}
       </div>
-      <ThemeToggle className="shrink-0" />
+      <ThemeToggle className="shrink-0 hidden lg:grid" />
     </div>
   )
 }
