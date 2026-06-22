@@ -12,7 +12,7 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory
+from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -33,6 +33,7 @@ class ScamRequest(BaseModel):
     text: str
     channel: Optional[str] = "Unknown"
     language: Optional[str] = "en"
+    use_ai: Optional[bool] = False   # opt-in Gemini augmentation
 
 
 # ---------- meta ----------
@@ -46,6 +47,11 @@ def stats():
     return geo_stats.dashboard_stats()
 
 
+@app.get("/api/llm/status")
+def llm_status():
+    return llm.status()
+
+
 # ---------- scam / fraud-shield detection ----------
 @app.post("/api/scam/analyze")
 def analyze_scam(req: ScamRequest):
@@ -54,6 +60,17 @@ def analyze_scam(req: ScamRequest):
     payload["channel"] = req.channel
     payload["advisory"] = advisory.advisory_for(result.risk_level, req.language or "en")
     payload["language"] = req.language or "en"
+    payload["ai"] = {"requested": bool(req.use_ai)}
+
+    # Optional Gemini augmentation layered on top of the deterministic verdict.
+    if req.use_ai:
+        ai = llm.analyze(req.text)
+        payload["ai"] = {**payload["ai"], **ai}
+        if ai.get("available") and "risk_score" in ai:
+            # Fuse: rule engine weighted slightly higher (auditable), AI adds nuance.
+            fused = round(0.55 * result.risk_score + 0.45 * ai["risk_score"])
+            payload["fused_risk_score"] = fused
+            payload["fused_risk_level"] = scam_engine._level_from_score(fused)
     return payload
 
 

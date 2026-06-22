@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Zap, FileText, ShieldAlert, ListChecks, Languages } from 'lucide-react'
+import { Zap, FileText, ShieldAlert, ListChecks, Languages, Sparkles } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
-import { analyzeScam, getScamSamples } from '../api.js'
+import { analyzeScam, getScamSamples, getLlmStatus } from '../api.js'
 
 const LANGS = [
   ['en', 'English'], ['hi', 'हिन्दी'], ['ta', 'தமிழ்'],
@@ -30,25 +30,78 @@ function Highlighted({ text, spans }) {
   return <p className="whitespace-pre-wrap leading-relaxed">{out}</p>
 }
 
-export default function ScamDetector() {
+export default function AIPanel({ ai }) {
+  if (!ai.available) {
+    return (
+      <div className="rounded-xl border border-white/8 bg-ink-700 p-5 text-sm text-gray-400 flex items-start gap-3">
+        <Sparkles size={18} className="text-gray-500 shrink-0 mt-0.5" />
+        <div>
+          <div className="text-gray-300 font-600">Gemini AI layer inactive</div>
+          {ai.reason || 'Set GEMINI_API_KEY in backend/.env to enable deep reasoning.'} The verdict above is from the deterministic rule engine.
+        </div>
+      </div>
+    )
+  }
+  if (ai.error) {
+    return (
+      <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-5 text-sm text-yellow-300">
+        Gemini call failed: {ai.error}
+      </div>
+    )
+  }
+  return (
+    <div className="rounded-xl border border-brand/30 bg-gradient-to-br from-brand/10 to-transparent p-5">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-display font-600 text-white flex items-center gap-2">
+          <Sparkles size={18} className="text-brand" /> Gemini AI analysis
+        </h3>
+        <span className="text-[10px] text-gray-500">{ai.model}</span>
+      </div>
+      <div className="flex items-center gap-3 mb-3">
+        <RiskBadge level={ai.risk_score >= 75 ? 'CRITICAL' : ai.risk_score >= 50 ? 'HIGH' : ai.risk_score >= 25 ? 'MEDIUM' : 'LOW'} />
+        <span className="text-sm text-gray-300">AI score <span className="text-white font-700">{ai.risk_score}</span>/100</span>
+        <span className="text-xs text-gray-500">· {ai.scam_type}</span>
+      </div>
+      <p className="text-sm text-gray-200 leading-relaxed">{ai.reasoning}</p>
+      {ai.novel_tactics?.length > 0 && (
+        <div className="mt-3">
+          <div className="text-xs text-gray-400 mb-1.5">Tactics surfaced by reasoning (beyond keyword rules):</div>
+          <div className="flex flex-wrap gap-2">
+            {ai.novel_tactics.map((t, i) => (
+              <span key={i} className="text-xs bg-brand/15 text-brand border border-brand/30 px-2.5 py-1 rounded-full">{t}</span>
+            ))}
+          </div>
+        </div>
+      )}
+      {ai.advisory && (
+        <div className="mt-3 rounded-lg bg-ink-900 border border-white/10 p-3 text-sm text-gray-100">{ai.advisory}</div>
+      )}
+    </div>
+  )
+}
+
+function ScamDetector() {
   const [samples, setSamples] = useState([])
   const [text, setText] = useState('')
   const [channel, setChannel] = useState('Video Call')
   const [language, setLanguage] = useState('en')
   const [res, setRes] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [useAi, setUseAi] = useState(false)
+  const [llm, setLlm] = useState(null)
 
   useEffect(() => {
     getScamSamples().then((d) => {
       setSamples(d)
       if (d?.length) setText(d[0].text)
     }).catch(() => {})
+    getLlmStatus().then(setLlm).catch(() => setLlm({ available: false }))
   }, [])
 
   const run = async () => {
     if (!text.trim()) return
     setLoading(true)
-    try { setRes(await analyzeScam(text, channel, language)) }
+    try { setRes(await analyzeScam(text, channel, language, useAi)) }
     catch { setRes({ error: 'Backend not reachable on :8000' }) }
     finally { setLoading(false) }
   }
@@ -86,6 +139,17 @@ export default function ScamDetector() {
                 </select>
               </div>
             </div>
+
+            <label className={`mt-4 flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors ${useAi ? 'border-brand/50 bg-brand/10' : 'border-white/10 bg-ink-900'} ${llm && !llm.available ? 'opacity-60' : ''}`}>
+              <span className="flex items-center gap-2 text-sm text-gray-200">
+                <Sparkles size={16} className="text-brand" />
+                Gemini AI deep analysis
+                {llm && !llm.available && <span className="text-[10px] text-gray-500">(set GEMINI_API_KEY to enable)</span>}
+                {llm?.available && <span className="text-[10px] text-emerald-400">● {llm.model}</span>}
+              </span>
+              <input type="checkbox" checked={useAi} disabled={llm && !llm.available}
+                onChange={(e) => setUseAi(e.target.checked)} className="accent-brand w-4 h-4" />
+            </label>
 
             <button onClick={run} disabled={loading}
               className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-60 text-black font-700 py-3 rounded transition-colors">
@@ -130,7 +194,16 @@ export default function ScamDetector() {
                 <div className="mt-4 rounded-lg bg-ink-900 border border-white/10 p-3 text-sm text-gray-100">
                   {res.advisory}
                 </div>
+                {res.fused_risk_score != null && (
+                  <div className="mt-3 text-xs text-gray-400">
+                    Fused score (rule 55% + AI 45%):{' '}
+                    <span className="text-white font-700">{res.fused_risk_score}</span>/100 ·{' '}
+                    <span className="text-brand">{res.fused_risk_level}</span>
+                  </div>
+                )}
               </div>
+
+              {res.ai?.requested && <AIPanel ai={res.ai} />}
 
               {res.tactics_detected?.length > 0 && (
                 <div className="rounded-xl border border-white/8 bg-ink-700 p-5">

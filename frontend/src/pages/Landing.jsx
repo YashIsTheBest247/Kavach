@@ -242,7 +242,7 @@ function Features() {
 }
 
 function TechStack() {
-  const items = ['Computer Vision', 'Graph AI & Network Analysis', 'NLP / LLM Classification', 'Geospatial Intelligence', 'Speech & Voice-spoof Detection', 'Agentic Multi-source Fusion']
+  const items = ['Google Gemini', 'Computer Vision', 'Graph AI & Network Analysis', 'NLP / LLM Classification', 'Geospatial Intelligence', 'Speech & Voice-spoof Detection', 'Agentic Multi-source Fusion']
   return (
     <section id="tech" className="bg-ink-900">
       <div className="mx-auto max-w-7xl px-5 py-16 text-center">

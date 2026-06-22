@@ -63,13 +63,28 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
            ├── fraud_graph.py     entity graph + connected-component ring clustering
            ├── counterfeit.py     Pillow image forensics + feature checklist scoring
            ├── advisory.py        6-language citizen advisories + sample scenarios
-           └── geo_stats.py       hotspot geodata + dashboard metrics
+           ├── geo_stats.py       hotspot geodata + dashboard metrics
+           └── llm.py             optional Gemini augmentation (graceful fallback)
 ```
 
 - **Frontend:** React 18, React Router, Tailwind (dark/orange theme), Recharts (dashboard),
   `react-force-graph-2d` (network graph), React-Leaflet (crime map), Lucide icons.
 - **Backend:** FastAPI, Pydantic, Pillow. Pure-Python, deterministic engines → reliable demo,
-  no API keys required. (An LLM layer can be added on top of the same interfaces.)
+  no API keys required.
+- **AI layer (optional):** **Google Gemini** (`gemini-2.5-flash` via `google-genai`) augments
+  the scam detector with intent-level reasoning and *novel-tactic* detection. It's layered ON TOP
+  of the rule engine and **degrades gracefully** — no `GEMINI_API_KEY` ⇒ the platform runs on the
+  deterministic engine alone, so the demo never breaks.
+
+### 🤖 Enabling Gemini
+```bash
+cd backend
+cp .env.example .env        # then edit .env
+# GEMINI_API_KEY=...   (get one free at https://aistudio.google.com/apikey)
+```
+In the **Digital Arrest Detector**, toggle **"Gemini AI deep analysis"** before analysing.
+The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics, and a
+**fused score** (rule 55% / AI 45%). The toggle auto-disables if no key is configured.
 
 ---
 
@@ -78,7 +93,8 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
 |---|---|---|
 | GET | `/api/health` | health check |
 | GET | `/api/stats` | dashboard metrics |
-| POST | `/api/scam/analyze` | analyse a message/transcript → risk, tactics, evidence, advisory |
+| GET | `/api/llm/status` | whether the Gemini AI layer is configured |
+| POST | `/api/scam/analyze` | analyse a message/transcript → risk, tactics, evidence, advisory (+ Gemini if `use_ai:true`) |
 | GET | `/api/scam/samples` | sample scam scenarios |
 | GET | `/api/fraud/graph` | fraud network nodes + edges |
 | GET | `/api/fraud/packages` | clustered ring intelligence packages |
