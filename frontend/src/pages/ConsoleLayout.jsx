@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
@@ -87,6 +87,12 @@ export default function ConsoleLayout() {
 
 function ConsoleMain() {
   const location = useLocation()
+
+  // Jump to the top whenever the route changes (don't carry scroll between pages).
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [location.pathname])
+
   return (
     <main className="flex-1 min-w-0 overflow-x-hidden">
       <div key={location.pathname} className="page-enter">
