@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Play, ShieldCheck, Network, ScanLine, MessageSquareWarning, MapPin,
-  PhoneCall, ArrowRight, Zap, Lock, Globe,
+  PhoneCall, ArrowRight, Zap, Lock, Globe, Mic, Target,
 } from 'lucide-react'
 import { Logo, RiskBadge, ThemeToggle } from '../components/ui.jsx'
 import { analyzeScam } from '../api.js'
@@ -16,10 +16,12 @@ const NAV = [
 
 const FEATURES = [
   { icon: MessageSquareWarning, title: 'Digital Arrest Detector', desc: 'Real-time classifier that flags fake-CBI / digital-arrest scripts before money moves — with an explainable evidence trail.', to: '/console/scam-detector' },
+  { icon: Mic, title: 'Voice-Spoof Detection', desc: 'Explainable audio forensics that flags AI-cloned / synthetic voices used in scam calls — try it with built-in demo clips.', to: '/console/voice-spoof' },
   { icon: Network, title: 'Fraud Network Graph', desc: 'Clusters victims, mule accounts and spoofed numbers into coordinated rings and emits court-auditable intelligence packages.', to: '/console/fraud-graph' },
   { icon: ScanLine, title: 'Counterfeit Currency Screen', desc: 'On-device image forensics + security-feature checklist to screen FICN at the point of contact.', to: '/console/counterfeit' },
   { icon: PhoneCall, title: 'Citizen Fraud Shield', desc: 'Multi-channel assistant giving instant scam verdicts and guided reporting in 6 Indian languages.', to: '/console/fraud-shield' },
   { icon: MapPin, title: 'Geospatial Crime Map', desc: 'Live hotspot map of fraud complaints and FICN seizures for patrol prioritisation and inter-district sharing.', to: '/console/crime-map' },
+  { icon: Target, title: 'Measured Metrics', desc: 'Precision, recall and false-positive/negative rates on labelled hold-out sets — the numbers that actually save lives.', to: '/console/metrics' },
   { icon: ShieldCheck, title: 'Command Dashboard', desc: 'Unified situational picture: detection volumes, rings tracked, rupees protected and response latency.', to: '/console' },
 ]
 

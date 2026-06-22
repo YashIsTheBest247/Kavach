@@ -1,17 +1,19 @@
 import { NavLink, Outlet, Link } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
-  PhoneCall, MapPin, ArrowLeft,
+  PhoneCall, MapPin, ArrowLeft, Mic, Target,
 } from 'lucide-react'
 import { Logo, ThemeToggle } from '../components/ui.jsx'
 
 const LINKS = [
   { to: '/console', end: true, icon: LayoutDashboard, label: 'Command Dashboard' },
   { to: '/console/scam-detector', icon: MessageSquareWarning, label: 'Digital Arrest Detector' },
+  { to: '/console/voice-spoof', icon: Mic, label: 'Voice-Spoof Detection' },
   { to: '/console/fraud-graph', icon: Network, label: 'Fraud Network Graph' },
   { to: '/console/counterfeit', icon: ScanLine, label: 'Counterfeit Screen' },
   { to: '/console/fraud-shield', icon: PhoneCall, label: 'Citizen Fraud Shield' },
   { to: '/console/crime-map', icon: MapPin, label: 'Crime Map' },
+  { to: '/console/metrics', icon: Target, label: 'Measured Metrics' },
 ]
 
 export default function ConsoleLayout() {

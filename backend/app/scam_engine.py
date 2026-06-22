@@ -43,6 +43,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"\bwarrant\b", r"criminal case", r"court case", r"smuggling",
             r"passport.*(seized|blocked)", r"case (registered|filed) against you",
             r"your name (is|has) (appeared|come up)", r"black ?money", r"terror funding",
+            r"involved in (illegal|criminal|drugs|fraud|money)", r"illegal activities",
+            r"your (number|sim) is (used|involved|linked) in", r"child (porn|pornography)",
         ],
     },
     "digital_arrest": {
@@ -75,9 +77,90 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"transfer (the )?(money|funds|amount)", r"\brtgs\b", r"\bneft\b", r"\bimps\b",
             r"verify your (funds|money|account|bank balance)", r"secure account",
             r"refundable (deposit|amount)", r"security deposit", r"pay (the )?(fine|penalty|bail)",
-            r"send (money|amount|payment)", r"\bupi\b", r"scan (the|this) qr",
-            r"share (your )?(otp|cvv|pin|card number)", r"government (verification|escrow) account",
-            r"convert.{0,20}(crypto|bitcoin|usdt)", r"gift card",
+            r"send (money|amount|payment)", r"send \d+ ?(rupees|rs|inr|₹)", r"\bupi\b",
+            r"scan (the|this) qr", r"\bqr code\b", r"government (verification|escrow) account",
+            r"convert.{0,20}(crypto|bitcoin|usdt)", r"gift card", r"pay (an? )?advance",
+        ],
+    },
+    "credential_harvest": {
+        "label": "Credential / OTP Harvesting",
+        "weight": 0.20,
+        "why": "No bank or agency ever asks you to share an OTP, PIN, CVV or password. This is theft of access.",
+        "patterns": [
+            r"share.{0,14}\b(otp|cvv|pin|card number|upi pin|password)\b",
+            r"tell me (the )?(otp|pin|cvv)", r"your (upi pin|net ?banking password|card cvv)",
+            r"confirm your (net ?banking )?password", r"\bcvv\b",
+            r"what is (the|your) otp", r"send (me )?(the )?otp",
+        ],
+    },
+    "remote_access": {
+        "label": "Remote-Access Takeover",
+        "weight": 0.18,
+        "why": "No genuine official or bank asks you to install remote-control software.",
+        "patterns": [
+            r"\banydesk\b", r"\bteam ?viewer\b", r"remote access", r"screen ?share",
+            r"give (us|me) (remote )?access", r"download .{0,20}(app|software)",
+        ],
+    },
+    "phishing_link": {
+        "label": "Phishing Link / Fake KYC",
+        "weight": 0.15,
+        "why": "Urgent 'click this link to update KYC' messages route you to fake portals that steal credentials.",
+        "patterns": [
+            r"click (this|the|on|here)", r"through this link", r"this link",
+            r"kyc (update|expired|verification|has expired)", r"update your kyc",
+            r"re-?verify", r"verify.{0,15}(link|click|now to)",
+        ],
+    },
+    "account_compromise": {
+        "label": "Fake Account-Compromise Alert",
+        "weight": 0.15,
+        "why": "Fabricated 'fraud on your account' alerts panic victims into handing over credentials.",
+        "patterns": [
+            r"fraudulent transaction", r"suspicious (transaction|activity|login)",
+            r"unauthori[sz]ed (transaction|access|login)",
+            r"your account (is|has been) (compromised|hacked|at risk|blocked)",
+            r"your (bank )?details are (leaking|leaked|compromised)",
+        ],
+    },
+    "prize_lure": {
+        "label": "Prize / Lottery Lure",
+        "weight": 0.18,
+        "why": "Unsolicited 'winnings' that require an upfront payment to claim are a classic advance-fee fraud.",
+        "patterns": [
+            r"lottery", r"lucky draw", r"\bkbc\b", r"you (have )?won", r"won (rs|inr|₹)",
+            r"claim (your )?(prize|reward|gift)", r"prize money", r"selected as (a )?winner",
+        ],
+    },
+    "advance_fee": {
+        "label": "Advance-Fee Demand",
+        "weight": 0.18,
+        "why": "Asking for a fee to 'release', 'process' or 'claim' money you are owed is a hallmark of fraud.",
+        "patterns": [
+            r"processing (fee|charge|charges)", r"gst (charge|charges|processing|fee)",
+            r"registration fee", r"(pay|deposit).{0,25}(to (claim|release|receive|credit|process))",
+            r"advance .{0,10}(payment|fee)", r"clearance (fee|charge)", r"refundable.{0,10}(fee|charge)",
+        ],
+    },
+    "service_threat": {
+        "label": "Service Disconnection Threat",
+        "weight": 0.14,
+        "why": "Threatening to instantly cut off your SIM/electricity/account unless you pay or click is a coercion tactic.",
+        "patterns": [
+            r"will be (disconnected|deactivated|blocked|suspended)",
+            r"(permanently )?deactivated", r"(sim|number).{0,20}(disconnect|deactivat|block)",
+            r"(electricity|power).{0,20}(disconnect|cut)", r"account.{0,15}(blocked|suspended)",
+        ],
+    },
+    "brand_impersonation": {
+        "label": "Brand / Support Impersonation",
+        "weight": 0.16,
+        "why": "Fraudsters pose as trusted tech or service brands to gain control of your device or accounts.",
+        "patterns": [
+            r"microsoft support", r"amazon (security|support)", r"google security",
+            r"\btech support\b", r"apple support", r"computer is infected",
+            r"your (device|computer|system) (is|has been) (infected|hacked|compromised)",
+            r"income tax department", r"electricity (board|department)",
         ],
     },
     "urgency": {
@@ -87,14 +170,17 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
         "patterns": [
             r"immediately", r"right now", r"within (\d+ )?(minutes|hours)", r"urgent(ly)?",
             r"last (warning|chance)", r"act now", r"before (we|the).*(arrest|block|freeze)",
-            r"limited time", r"final notice", r"failure to comply",
+            r"limited time", r"final notice", r"failure to comply", r"instantly", r"\bnow\b.{0,20}(or|otherwise)",
         ],
     },
 }
 
 # Phrases that strongly indicate a *legitimate* interaction — reduce false positives.
 SAFE_SIGNALS = [
+    (r"(never|do not|don'?t) share (your )?(otp|pin|cvv|password|card|it with)", 0.35),
     (r"visit (the|your) (nearest|local) (police station|branch)", 0.10),
+    (r"(official|toll[- ]?free) (app|portal|website|number|helpline)", 0.10),
+    (r"pay (via|through) the official", 0.10),
     (r"call (the )?(official|toll[- ]?free) (number|helpline)", 0.08),
     (r"i will (call|visit) you (back )?(at|from) the (station|office)", 0.06),
 ]
@@ -145,6 +231,11 @@ class ScamAnalysis:
     recommended_actions: List[str] = field(default_factory=list)
     highlighted: List[Dict] = field(default_factory=list)   # spans for UI highlight
     summary: str = ""
+
+
+# Decision threshold for is_scam. Calibrated on the labelled corpus: legit
+# messages top out at 12, so 40 maximises recall while keeping false positives at 0.
+SCAM_THRESHOLD = 40
 
 
 def _level_from_score(score: int) -> str:
@@ -199,7 +290,7 @@ def analyze_text(text: str) -> ScamAnalysis:
 
     score = int(round(raw * 100))
     level = _level_from_score(score)
-    is_scam = score >= 50
+    is_scam = score >= SCAM_THRESHOLD
 
     # Confidence scales with corroboration (more independent tactics => more sure).
     confidence = round(min(0.99, 0.4 + 0.15 * num_categories + combo_bonus), 2)

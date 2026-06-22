@@ -23,4 +23,13 @@ export const screenNote = (file, denomination, confirmedFeatures) => {
 }
 export const getHotspots = () => api.get('/geo/hotspots').then((r) => r.data)
 
+export const voiceDemo = (kind) =>
+  api.get('/voice/demo', { params: { kind } }).then((r) => r.data)
+export const analyzeVoice = (file) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return api.post('/voice/analyze', fd).then((r) => r.data)
+}
+export const getMetrics = () => api.get('/metrics').then((r) => r.data)
+
 export default api

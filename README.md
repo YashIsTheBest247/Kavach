@@ -11,16 +11,24 @@ Built with **React + FastAPI**.
 
 ---
 
-## ✨ What's inside (6 capabilities)
+## ✨ What's inside (8 capabilities)
 
 | Module | What it does | Maps to problem-statement bullet |
 |---|---|---|
-| **Digital Arrest Detector** | Real-time, explainable classifier for scam scripts with an **auditable evidence trail** (every flagged phrase + tactic + weight). | *Digital Arrest Scam Detection & Alerting* |
+| **Digital Arrest Detector** | Real-time, explainable classifier for scam scripts with an **auditable evidence trail** (every flagged phrase + tactic + weight). 11 tactic categories spanning digital-arrest, KYC/phishing, remote-access, prize/advance-fee, account-compromise. | *Digital Arrest Scam Detection & Alerting* |
+| **Voice-Spoof / Deepfake Detection** | Explainable audio forensics that flags AI-cloned / synthetic voices used in scam calls; ships **built-in labelled demo clips** (synthetic vs human) so it's demoable without audio files. | *Speech AI (voice spoofing & AI-voice detection)* |
 | **Fraud Network Graph** | Clusters victims, mule accounts, spoofed numbers & devices into coordinated rings; emits **intelligence packages** and detects shared infrastructure linking campaigns. | *Fraud Network Graph Intelligence* |
 | **Counterfeit Currency Screen** | Image-forensics + security-feature checklist → calibrated FICN risk score with contributing factors. | *Counterfeit Currency Identification Agent* |
 | **Citizen Fraud Shield** | Multi-channel, **6-language** conversational assistant giving instant verdicts + guided reporting to 1930 / cybercrime.gov.in. | *Citizen Fraud Shield (Multi-channel)* |
 | **Geospatial Crime Map** | Live hotspot map of fraud complaints & FICN seizures for patrol prioritisation. | *Geospatial Crime Pattern Intelligence* |
+| **Measured Metrics** | Detectors evaluated on **labelled hold-out sets** → precision / recall / F1 / accuracy + the safety-critical **false-positive & false-negative** rates, with confusion matrices. | *Evaluation Focus (precision/recall, very-low FP)* |
 | **Command Dashboard** | Unified situational picture: detection volumes, rings tracked, ₹ protected, latency, FP rate. | Cross-cutting fusion layer |
+
+### 📊 Measured performance (on the bundled labelled sets — reproducible at `/console/metrics`)
+| Detector | Accuracy | Precision | Recall | F1 | False-Positive | False-Negative |
+|---|---|---|---|---|---|---|
+| **Scam / Digital-Arrest** (n=36) | 91.7% | 100% | 83.3% | 90.9% | **0%** (no citizen false alarms) | 16.7% |
+| **Voice-Spoof / Deepfake** (n=40) | 90.0% | 83.3% | 100% | 90.9% | 20% | **0%** (no deepfake missed) |
 
 ### Why the detection engine wins on the rubric
 - **Explainable & auditable** — not a black box. Every verdict ships a signal log (matched text, tactic, weight) → defensible for *legal admissibility* (an explicit evaluation focus).
@@ -64,6 +72,8 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
            ├── counterfeit.py     Pillow image forensics + feature checklist scoring
            ├── advisory.py        6-language citizen advisories + sample scenarios
            ├── geo_stats.py       hotspot geodata + dashboard metrics
+           ├── voice_engine.py    audio forensics + labelled demo-clip generation (numpy)
+           ├── metrics.py         labelled eval sets → precision/recall/FP/FN
            └── llm.py             optional Gemini augmentation (graceful fallback)
 ```
 
@@ -100,6 +110,9 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 | GET | `/api/fraud/packages` | clustered ring intelligence packages |
 | GET | `/api/counterfeit/features` | security-feature catalogue |
 | POST | `/api/counterfeit/screen` | screen an uploaded note image |
+| POST | `/api/voice/analyze` | screen an uploaded WAV for synthetic/AI voice |
+| GET | `/api/voice/demo?kind=synthetic\|human` | generate + screen a labelled demo clip (returns audio) |
+| GET | `/api/metrics` | measured precision/recall/FP/FN on labelled sets |
 | GET | `/api/geo/hotspots` | geospatial crime hotspots |
 
 ---

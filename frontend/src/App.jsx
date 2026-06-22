@@ -7,6 +7,8 @@ import FraudGraph from './pages/FraudGraph.jsx'
 import Counterfeit from './pages/Counterfeit.jsx'
 import FraudShield from './pages/FraudShield.jsx'
 import CrimeMap from './pages/CrimeMap.jsx'
+import VoiceSpoof from './pages/VoiceSpoof.jsx'
+import Metrics from './pages/Metrics.jsx'
 
 export default function App() {
   return (
@@ -18,7 +20,9 @@ export default function App() {
         <Route path="fraud-graph" element={<FraudGraph />} />
         <Route path="counterfeit" element={<Counterfeit />} />
         <Route path="fraud-shield" element={<FraudShield />} />
+        <Route path="voice-spoof" element={<VoiceSpoof />} />
         <Route path="crime-map" element={<CrimeMap />} />
+        <Route path="metrics" element={<Metrics />} />
       </Route>
     </Routes>
   )

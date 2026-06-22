@@ -12,7 +12,7 @@ from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm
+from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm, voice_engine, metrics
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -110,6 +110,25 @@ async def counterfeit_screen(
     img_bytes = await file.read()
     feats: List[str] = [f for f in confirmed_features.split(",") if f]
     return counterfeit.screen_note(img_bytes, denomination, feats)
+
+
+# ---------- voice-spoof / deepfake-voice ----------
+@app.post("/api/voice/analyze")
+async def voice_analyze(file: UploadFile = File(...)):
+    data = await file.read()
+    return voice_engine.analyze_bytes(data)
+
+
+@app.get("/api/voice/demo")
+def voice_demo(kind: str = "synthetic"):
+    kind = kind if kind in ("synthetic", "human") else "synthetic"
+    return voice_engine.demo(kind)
+
+
+# ---------- measured metrics ----------
+@app.get("/api/metrics")
+def metrics_all():
+    return metrics.all_metrics()
 
 
 # ---------- geospatial ----------
