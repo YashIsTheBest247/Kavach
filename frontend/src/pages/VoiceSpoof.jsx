@@ -3,12 +3,14 @@ import { Mic, Upload, Waves, Volume2, Info } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
 import { voiceDemo, analyzeVoice } from '../api.js'
+import { useLang, t } from '../i18n.js'
 
 export default function VoiceSpoof() {
   const [res, setRes] = useState(null)
   const [audioUrl, setAudioUrl] = useState(null)
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(null)
+  useLang()
 
   const runDemo = async (kind) => {
     setErr(null); setLoading(true); setRes(null); setAudioUrl(null)
@@ -33,43 +35,43 @@ export default function VoiceSpoof() {
 
   return (
     <>
-      <PageHeader title="Voice-Spoof" accent="& Deepfake Detection"
-        subtitle="Explainable audio forensics that flags synthetic / AI-cloned voices used in scam calls" />
+      <PageHeader title={t('Voice-Spoof', 'वॉइस-स्पूफ़')} accent={t('& Deepfake Detection', 'और डीपफेक डिटेक्शन')}
+        subtitle={t('Explainable audio forensics that flags synthetic / AI-cloned voices used in scam calls', 'व्याख्यायोग्य ऑडियो फोरेंसिक जो घोटाला कॉल में इस्तेमाल सिंथेटिक / AI-क्लोन आवाज़ों को पकड़ता है')} />
       <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
             <div className="text-sm font-600 text-gray-300 mb-1 flex items-center gap-2">
-              <Waves size={16} className="text-brand" /> Try a labelled demo clip
+              <Waves size={16} className="text-brand" /> {t('Try a labelled demo clip', 'एक लेबल किया डेमो क्लिप आज़माएँ')}
             </div>
             <p className="text-xs text-gray-500 mb-3">
-              Generates a clip with known ground truth, plays it, and screens it — no audio file needed.
+              {t('Generates a clip with known ground truth, plays it, and screens it — no audio file needed.', 'ज्ञात ग्राउंड ट्रुथ वाली क्लिप बनाता है, चलाता है और जाँचता है — कोई ऑडियो फ़ाइल नहीं चाहिए।')}
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button onClick={() => runDemo('synthetic')} disabled={loading}
                 className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-ink-900 text-gray-300 py-3 hover:border-brand/50 hover:text-white transition-colors disabled:opacity-60">
-                Synthetic / AI voice
+                {t('Synthetic / AI voice', 'सिंथेटिक / AI आवाज़')}
               </button>
               <button onClick={() => runDemo('human')} disabled={loading}
                 className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-ink-900 text-gray-300 py-3 hover:border-brand/50 hover:text-white transition-colors disabled:opacity-60">
-                Human voice
+                {t('Human voice', 'मानव आवाज़')}
               </button>
             </div>
           </div>
 
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
-            <div className="text-sm font-600 text-gray-300 mb-3">…or upload a call recording (WAV)</div>
+            <div className="text-sm font-600 text-gray-300 mb-3">{t('…or upload a call recording (WAV)', '…या कॉल रिकॉर्डिंग अपलोड करें (WAV)')}</div>
             <label className="block">
               <div className="border-2 border-dashed border-white/15 rounded-xl p-6 text-center cursor-pointer hover:border-brand/40 transition-colors">
                 <Upload size={30} className="mx-auto mb-2 text-gray-500" />
-                <div className="text-sm text-gray-400">Click to upload a .wav clip</div>
-                <div className="text-xs text-gray-600 mt-1">mono/stereo PCM WAV · a few seconds is enough</div>
+                <div className="text-sm text-gray-400">{t('Click to upload a .wav clip', '.wav क्लिप अपलोड करने हेतु क्लिक करें')}</div>
+                <div className="text-xs text-gray-600 mt-1">{t('mono/stereo PCM WAV · a few seconds is enough', 'मोनो/स्टीरियो PCM WAV · कुछ सेकंड पर्याप्त हैं')}</div>
                 <input type="file" accept="audio/wav,.wav" className="hidden" onChange={(e) => onFile(e.target.files[0])} />
               </div>
             </label>
             {audioUrl && (
               <div className="mt-4">
-                <div className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Volume2 size={12} /> Playback</div>
+                <div className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Volume2 size={12} /> {t('Playback', 'प्लेबैक')}</div>
                 <audio controls src={audioUrl} className="w-full" />
               </div>
             )}
@@ -78,24 +80,24 @@ export default function VoiceSpoof() {
 
           <div className="rounded-lg bg-ink-800 border border-white/8 p-3 text-xs text-gray-500 flex gap-2">
             <Info size={14} className="shrink-0 mt-0.5" />
-            Heuristic MVP — pairs with the scam-script detector to catch AI-voice digital-arrest calls. Measured accuracy on the Metrics page.
+            {t('Heuristic MVP — pairs with the scam-script detector to catch AI-voice digital-arrest calls. Measured accuracy on the Metrics page.', 'ह्यूरिस्टिक MVP — AI-आवाज़ डिजिटल-अरेस्ट कॉल पकड़ने हेतु घोटाला-स्क्रिप्ट डिटेक्टर के साथ काम करता है। मापी गई सटीकता मेट्रिक्स पेज पर।')}
           </div>
         </div>
 
         {/* output */}
         <div className="space-y-4">
-          {loading && <div className="rounded-xl border border-white/8 bg-ink-700 p-6"><Spinner label="Running audio forensics…" /></div>}
+          {loading && <div className="rounded-xl border border-white/8 bg-ink-700 p-6"><Spinner label={t('Running audio forensics…', 'ऑडियो फोरेंसिक चल रहा है…')} /></div>}
           {res && !loading && (
             <>
               <div className={`rounded-xl border p-6 ${res.risk_level === 'HIGH' ? 'border-red-500/40 bg-red-500/5' : res.risk_level === 'MEDIUM' ? 'border-yellow-500/40 bg-yellow-500/5' : 'border-emerald-500/40 bg-emerald-500/5'}`}>
                 <div className="flex items-center justify-between">
                   <RiskBadge level={res.risk_level} />
-                  <span className="text-xs text-gray-500">confidence {Math.round(res.confidence * 100)}%</span>
+                  <span className="text-xs text-gray-500">{t('confidence', 'विश्वास')} {Math.round(res.confidence * 100)}%</span>
                 </div>
                 <div className="mt-4 font-display text-2xl font-700 text-white">{res.verdict}</div>
                 <div className="mt-2 flex items-end gap-2">
                   <span className="font-display text-5xl font-700 text-white">{res.synthetic_risk_score}</span>
-                  <span className="text-gray-500 mb-1">/ 100 synthetic-voice risk</span>
+                  <span className="text-gray-500 mb-1">{t('/ 100 synthetic-voice risk', '/ 100 सिंथेटिक-आवाज़ जोखिम')}</span>
                 </div>
                 <div className="mt-3 h-2 rounded-full bg-ink-900 overflow-hidden">
                   <div className={`h-full ${res.synthetic_risk_score >= 60 ? 'bg-red-500' : res.synthetic_risk_score >= 35 ? 'bg-yellow-500' : 'bg-emerald-500'}`}
@@ -103,13 +105,13 @@ export default function VoiceSpoof() {
                 </div>
                 {res.demo_kind && (
                   <div className="mt-3 text-xs text-gray-500">
-                    Ground truth for this demo clip: <span className="text-gray-300 font-600">{res.demo_kind === 'synthetic' ? 'Synthetic / AI' : 'Human'}</span>
+                    {t('Ground truth for this demo clip:', 'इस डेमो क्लिप के लिए ग्राउंड ट्रुथ:')} <span className="text-gray-300 font-600">{res.demo_kind === 'synthetic' ? t('Synthetic / AI', 'सिंथेटिक / AI') : t('Human', 'मानव')}</span>
                   </div>
                 )}
               </div>
 
               <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
-                <h3 className="font-display font-600 text-white mb-3">Acoustic factors</h3>
+                <h3 className="font-display font-600 text-white mb-3">{t('Acoustic factors', 'ध्वनिक कारक')}</h3>
                 <div className="space-y-2">
                   {res.factors.map((f, i) => (
                     <div key={i} className="flex items-start justify-between gap-3 text-sm border-b border-white/5 pb-2">
@@ -127,7 +129,7 @@ export default function VoiceSpoof() {
 
               {res.features && (
                 <div className="rounded-xl border border-white/8 bg-ink-700 p-5 text-xs text-gray-400">
-                  <div className="font-600 text-gray-300 mb-2">Extracted features</div>
+                  <div className="font-600 text-gray-300 mb-2">{t('Extracted features', 'निकाली गई विशेषताएँ')}</div>
                   <div className="grid grid-cols-2 gap-2">
                     <span>Duration: {res.features.duration_s}s @ {res.features.sample_rate} Hz</span>
                     <span>Energy CV: {res.features.energy_cv}</span>
@@ -145,7 +147,7 @@ export default function VoiceSpoof() {
           {!res && !loading && (
             <div className="rounded-xl border border-dashed border-white/10 bg-ink-700/50 p-10 text-center text-gray-500">
               <Mic size={40} className="mx-auto mb-3 text-gray-600" />
-              Try a demo clip or upload a recording to screen for AI-cloned voice.
+              {t('Try a demo clip or upload a recording to screen for AI-cloned voice.', 'AI-क्लोन आवाज़ जाँचने हेतु डेमो क्लिप आज़माएँ या रिकॉर्डिंग अपलोड करें।')}
             </div>
           )}
         </div>

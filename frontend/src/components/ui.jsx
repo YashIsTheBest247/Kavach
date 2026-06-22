@@ -1,6 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
-import { Shield, Sun, Moon, ChevronDown, Check } from 'lucide-react'
+import { Shield, Sun, Moon, ChevronDown, Check, Languages } from 'lucide-react'
 import { useTheme, toggleTheme } from '../theme.js'
+import { useLang, toggleLang } from '../i18n.js'
+
+export function LangToggle({ className = '' }) {
+  const lang = useLang()
+  return (
+    <button onClick={toggleLang} aria-label="Switch language"
+      title={lang === 'en' ? 'हिन्दी में बदलें' : 'Switch to English'}
+      className={`inline-flex items-center gap-1.5 h-9 px-2.5 rounded-lg border border-white/10 text-gray-300 hover:text-brand hover:border-brand/50 transition-colors ${className}`}>
+      <Languages size={16} />
+      <span className="text-xs font-700">{lang === 'en' ? 'EN' : 'हिं'}</span>
+    </button>
+  )
+}
 
 /**
  * Custom dropdown — fully themed (curved, brand highlight, no native blue).

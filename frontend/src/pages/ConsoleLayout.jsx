@@ -4,22 +4,24 @@ import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
   PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X,
 } from 'lucide-react'
-import { Logo, ThemeToggle } from '../components/ui.jsx'
+import { Logo, ThemeToggle, LangToggle } from '../components/ui.jsx'
+import { useLang, t } from '../i18n.js'
 
 const LINKS = [
-  { to: '/console', end: true, icon: LayoutDashboard, label: 'Command Dashboard' },
-  { to: '/console/fusion', icon: Workflow, label: 'Threat Fusion (Agentic)' },
-  { to: '/console/scam-detector', icon: MessageSquareWarning, label: 'Digital Arrest Detector' },
-  { to: '/console/voice-spoof', icon: Mic, label: 'Voice-Spoof Detection' },
-  { to: '/console/fraud-graph', icon: Network, label: 'Fraud Network Graph' },
-  { to: '/console/counterfeit', icon: ScanLine, label: 'Counterfeit Screen' },
-  { to: '/console/fraud-shield', icon: PhoneCall, label: 'Citizen Fraud Shield' },
-  { to: '/console/crime-map', icon: MapPin, label: 'Crime Map' },
-  { to: '/console/metrics', icon: Target, label: 'Measured Metrics' },
+  { to: '/console', end: true, icon: LayoutDashboard, en: 'Command Dashboard', hi: 'कमांड डैशबोर्ड' },
+  { to: '/console/fusion', icon: Workflow, en: 'Threat Fusion (Agentic)', hi: 'थ्रेट फ्यूज़न (एजेंटिक)' },
+  { to: '/console/scam-detector', icon: MessageSquareWarning, en: 'Digital Arrest Detector', hi: 'डिजिटल अरेस्ट डिटेक्टर' },
+  { to: '/console/voice-spoof', icon: Mic, en: 'Voice-Spoof Detection', hi: 'वॉइस-स्पूफ़ डिटेक्शन' },
+  { to: '/console/fraud-graph', icon: Network, en: 'Fraud Network Graph', hi: 'फ्रॉड नेटवर्क ग्राफ़' },
+  { to: '/console/counterfeit', icon: ScanLine, en: 'Counterfeit Screen', hi: 'नकली नोट स्क्रीनिंग' },
+  { to: '/console/fraud-shield', icon: PhoneCall, en: 'Citizen Fraud Shield', hi: 'नागरिक फ्रॉड शील्ड' },
+  { to: '/console/crime-map', icon: MapPin, en: 'Crime Map', hi: 'क्राइम मैप' },
+  { to: '/console/metrics', icon: Target, en: 'Measured Metrics', hi: 'मापे गए मेट्रिक्स' },
 ]
 
 export default function ConsoleLayout() {
   const [open, setOpen] = useState(false)
+  useLang()
 
   return (
     <div className="min-h-screen bg-ink-900 lg:flex">
@@ -27,6 +29,7 @@ export default function ConsoleLayout() {
       <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between h-14 px-4 border-b border-white/5 bg-ink-800">
         <Link to="/"><Logo /></Link>
         <div className="flex items-center gap-2">
+          <LangToggle />
           <ThemeToggle />
           <button onClick={() => setOpen(true)} aria-label="Open menu"
             className="grid place-items-center w-9 h-9 rounded-lg border border-white/10 text-gray-300 hover:text-brand hover:border-brand/50">
@@ -60,16 +63,16 @@ export default function ConsoleLayout() {
                 }`
               }>
               <l.icon size={18} />
-              {l.label}
+              {t(l.en, l.hi)}
             </NavLink>
           ))}
         </nav>
         <div className="p-3 border-t border-white/5">
           <Link to="/" className="flex items-center gap-2 text-xs text-gray-500 hover:text-brand px-3 py-2">
-            <ArrowLeft size={14} /> Back to site
+            <ArrowLeft size={14} /> {t('Back to site', 'साइट पर वापस')}
           </Link>
           <div className="px-3 mt-2 text-[10px] text-gray-600">
-            Helpline <span className="text-brand">1930</span> · cybercrime.gov.in
+            {t('Helpline', 'हेल्पलाइन')} <span className="text-brand">1930</span> · cybercrime.gov.in
           </div>
         </div>
       </aside>
@@ -99,7 +102,10 @@ export function PageHeader({ title, subtitle, accent }) {
         </h1>
         {subtitle && <p className="text-xs md:text-sm text-gray-400 mt-1">{subtitle}</p>}
       </div>
-      <ThemeToggle className="shrink-0 hidden lg:grid" />
+      <div className="shrink-0 hidden lg:flex items-center gap-2">
+        <LangToggle />
+        <ThemeToggle />
+      </div>
     </div>
   )
 }

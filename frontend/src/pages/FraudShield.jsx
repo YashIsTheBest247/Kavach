@@ -3,6 +3,7 @@ import { Send, Bot, User, ShieldCheck, Phone } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Select } from '../components/ui.jsx'
 import { analyzeScam } from '../api.js'
+import { useLang, t, getLang } from '../i18n.js'
 
 const LANGS = [
   ['en', 'English'], ['hi', 'हिन्दी'], ['ta', 'தமிழ்'],
@@ -39,11 +40,15 @@ const PLACEHOLDER = {
 }
 
 export default function FraudShield() {
-  const [lang, setLang] = useState('en')
+  const [lang, setLang] = useState(getLang())   // default chat language to the site language
   const [input, setInput] = useState('')
-  const [msgs, setMsgs] = useState([{ who: 'bot', kind: 'text', text: GREETING.en }])
+  const [msgs, setMsgs] = useState([{ who: 'bot', kind: 'text', text: GREETING[getLang()] || GREETING.en }])
   const [busy, setBusy] = useState(false)
   const endRef = useRef(null)
+  const siteLang = useLang()
+
+  // Follow the site language when it is toggled.
+  useEffect(() => { setLang(siteLang) }, [siteLang])
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs, busy])
 
@@ -72,8 +77,8 @@ export default function FraudShield() {
 
   return (
     <>
-      <PageHeader title="Citizen" accent="Fraud Shield"
-        subtitle="Multi-channel, multi-language scam verdicts for the public — instant and guided" />
+      <PageHeader title={t('Citizen', 'नागरिक')} accent={t('Fraud Shield', 'फ्रॉड शील्ड')}
+        subtitle={t('Multi-channel, multi-language scam verdicts for the public — instant and guided', 'जनता के लिए बहु-चैनल, बहु-भाषा घोटाला निर्णय — तुरंत और मार्गदर्शित')} />
       <div className="p-4 md:p-8">
         <div className="max-w-3xl mx-auto rounded-2xl border border-white/8 bg-ink-700 overflow-hidden flex flex-col h-[72vh] min-h-[420px]">
           {/* header */}
@@ -81,8 +86,8 @@ export default function FraudShield() {
             <div className="flex items-center gap-2">
               <div className="grid place-items-center w-9 h-9 rounded-full bg-brand/20 text-brand"><ShieldCheck size={18} /></div>
               <div>
-                <div className="text-sm font-600 text-white">Kavach Shield</div>
-                <div className="text-[11px] text-emerald-400">● online · helpline 1930</div>
+                <div className="text-sm font-600 text-white">{t('Kavach Shield', 'कवच शील्ड')}</div>
+                <div className="text-[11px] text-emerald-400">● {t('online · helpline 1930', 'ऑनलाइन · हेल्पलाइन 1930')}</div>
               </div>
             </div>
             <Select value={lang} onChange={setLang} className="w-36"
@@ -94,7 +99,7 @@ export default function FraudShield() {
             {msgs.map((m, i) => <Bubble key={i} m={m} />)}
             {busy && (
               <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Bot size={16} /> <span className="animate-pulse">Analysing…</span>
+                <Bot size={16} /> <span className="animate-pulse">{t('Analysing…', 'विश्लेषण हो रहा है…')}</span>
               </div>
             )}
             <div ref={endRef} />

@@ -30,6 +30,9 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"cyber ?crime (cell|department|branch)", r"income tax department",
             r"\bpolice\b", r"\binspector\b", r"\bcommissioner\b", r"mumbai police",
             r"delhi police", r"crime branch", r"central bureau", r"\binterpol\b",
+            # Hindi
+            r"सीबीआई", r"ईडी", r"प्रवर्तन निदेशालय", r"पुलिस", r"इंस्पेक्टर", r"कस्टम",
+            r"नारकोटिक्स", r"साइबर ?क्राइम", r"आयकर विभाग", r"क्राइम ब्रांच",
         ],
     },
     "fear_accusation": {
@@ -45,6 +48,9 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"your name (is|has) (appeared|come up)", r"black ?money", r"terror funding",
             r"involved in (illegal|criminal|drugs|fraud|money)", r"illegal activities",
             r"your (number|sim) is (used|involved|linked) in", r"child (porn|pornography)",
+            # Hindi
+            r"मनी लॉन्ड्रिंग", r"मनी लॉन्डरिंग", r"गिरफ्तार", r"वारंट", r"ड्रग्स", r"नशीला",
+            r"अवैध", r"गैरकानूनी", r"मामला दर्ज", r"आपके (नाम|खिलाफ)", r"आपका (आधार|नंबर|सिम).{0,15}(इस्तेमाल|लिंक|शामिल)",
         ],
     },
     "digital_arrest": {
@@ -56,6 +62,9 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"stay on (the )?(call|video|line)", r"keep your camera on", r"video (call|surveillance)",
             r"you are under arrest", r"house arrest", r"monitor(ing|ed) you", r"24[ x]?7 surveillance",
             r"can ?not leave", r"remain (online|on call)", r"interrogation",
+            # Hindi
+            r"डिजिटल अरेस्ट", r"डिजिटल गिरफ्तारी", r"कॉल (मत|न) (काट|काटिए|काटना)",
+            r"वीडियो कॉल (पर|on)", r"निगरानी", r"कैमरा (चालू|ऑन)",
         ],
     },
     "isolation": {
@@ -67,6 +76,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"keep this (confidential|secret)", r"this is confidential",
             r"national security", r"official secrets", r"don'?t talk to anyone",
             r"go to a (separate|private) room", r"be alone", r"do not discuss",
+            # Hindi
+            r"किसी को (मत|न) (बताना|बताइए|बताएं)", r"गोपनीय", r"राज़ रखें", r"अकेले (कमरे|रहें)",
         ],
     },
     "payment_demand": {
@@ -80,6 +91,9 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"send (money|amount|payment)", r"send \d+ ?(rupees|rs|inr|₹)", r"\bupi\b",
             r"scan (the|this) qr", r"\bqr code\b", r"government (verification|escrow) account",
             r"convert.{0,20}(crypto|bitcoin|usdt)", r"gift card", r"pay (an? )?advance",
+            # Hindi
+            r"पैसे (ट्रांसफर|भेज|डाल)", r"रकम (भेज|ट्रांसफर)", r"खाते में (डाल|जमा|ट्रांसफर)",
+            r"सत्यापन के लिए", r"जुर्माना (भर|दे)", r"जमानत", r"यूपीआई", r"क्यूआर",
         ],
     },
     "credential_harvest": {
@@ -91,6 +105,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"tell me (the )?(otp|pin|cvv)", r"your (upi pin|net ?banking password|card cvv)",
             r"confirm your (net ?banking )?password", r"\bcvv\b",
             r"what is (the|your) otp", r"send (me )?(the )?otp",
+            # Hindi
+            r"ओटीपी (बता|भेज|साझा|शेयर)", r"पिन (बता|भेज)", r"सीवीवी", r"पासवर्ड (बता|साझा|शेयर)",
         ],
     },
     "remote_access": {
@@ -100,6 +116,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
         "patterns": [
             r"\banydesk\b", r"\bteam ?viewer\b", r"remote access", r"screen ?share",
             r"give (us|me) (remote )?access", r"download .{0,20}(app|software)",
+            # Hindi
+            r"एनीडेस्क", r"रिमोट (एक्सेस|कंट्रोल)", r"ऐप (डाउनलोड|इंस्टॉल)", r"स्क्रीन शेयर",
         ],
     },
     "phishing_link": {
@@ -110,6 +128,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"click (this|the|on|here)", r"through this link", r"this link",
             r"kyc (update|expired|verification|has expired)", r"update your kyc",
             r"re-?verify", r"verify.{0,15}(link|click|now to)",
+            # Hindi
+            r"लिंक पर क्लिक", r"इस लिंक", r"केवाईसी", r"केवाईसी (अपडेट|समाप्त)", r"पुनः सत्यापन",
         ],
     },
     "account_compromise": {
@@ -121,6 +141,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"unauthori[sz]ed (transaction|access|login)",
             r"your account (is|has been) (compromised|hacked|at risk|blocked)",
             r"your (bank )?details are (leaking|leaked|compromised)",
+            # Hindi
+            r"संदिग्ध (लेनदेन|गतिविधि)", r"खाता (हैक|ब्लॉक|कॉम्प्रोमाइज़)", r"अनधिकृत (लेनदेन|लॉगिन)",
         ],
     },
     "prize_lure": {
@@ -130,6 +152,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
         "patterns": [
             r"lottery", r"lucky draw", r"\bkbc\b", r"you (have )?won", r"won (rs|inr|₹)",
             r"claim (your )?(prize|reward|gift)", r"prize money", r"selected as (a )?winner",
+            # Hindi
+            r"लॉटरी", r"इनाम", r"लकी ड्रॉ", r"केबीसी", r"आपने जीत", r"पुरस्कार",
         ],
     },
     "advance_fee": {
@@ -140,6 +164,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"processing (fee|charge|charges)", r"gst (charge|charges|processing|fee)",
             r"registration fee", r"(pay|deposit).{0,25}(to (claim|release|receive|credit|process))",
             r"advance .{0,10}(payment|fee)", r"clearance (fee|charge)", r"refundable.{0,10}(fee|charge)",
+            # Hindi
+            r"प्रोसेसिंग (फीस|शुल्क)", r"जीएसटी (शुल्क|चार्ज)", r"पंजीकरण शुल्क", r"अग्रिम (भुगतान|शुल्क)",
         ],
     },
     "service_threat": {
@@ -150,6 +176,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"will be (disconnected|deactivated|blocked|suspended)",
             r"(permanently )?deactivated", r"(sim|number).{0,20}(disconnect|deactivat|block)",
             r"(electricity|power).{0,20}(disconnect|cut)", r"account.{0,15}(blocked|suspended)",
+            # Hindi
+            r"बंद (कर दिया|हो जाएगा)", r"ब्लॉक (कर|हो)", r"निष्क्रिय", r"(सिम|नंबर|बिजली).{0,15}(बंद|काट)",
         ],
     },
     "brand_impersonation": {
@@ -171,6 +199,8 @@ TACTIC_LIBRARY: Dict[str, Dict] = {
             r"immediately", r"right now", r"within (\d+ )?(minutes|hours)", r"urgent(ly)?",
             r"last (warning|chance)", r"act now", r"before (we|the).*(arrest|block|freeze)",
             r"limited time", r"final notice", r"failure to comply", r"instantly", r"\bnow\b.{0,20}(or|otherwise)",
+            # Hindi
+            r"तुरंत", r"अभी", r"जल्दी", r"फौरन", r"आखिरी (चेतावनी|मौका)", r"\d+ (मिनट|घंटे) में",
         ],
     },
 }
@@ -183,6 +213,10 @@ SAFE_SIGNALS = [
     (r"pay (via|through) the official", 0.10),
     (r"call (the )?(official|toll[- ]?free) (number|helpline)", 0.08),
     (r"i will (call|visit) you (back )?(at|from) the (station|office)", 0.06),
+    # Hindi
+    (r"(ओटीपी|पिन|पासवर्ड).{0,15}(किसी को )?(मत|न) (बताएं|बताना|साझा)", 0.35),
+    (r"(आधिकारिक|ऑफिशियल) (ऐप|पोर्टल|वेबसाइट)", 0.10),
+    (r"नज़दीकी (शाखा|ब्रांच|थाने)", 0.10),
 ]
 
 ACTION_PLAYBOOK = {

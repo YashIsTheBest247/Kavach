@@ -5,6 +5,7 @@ import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
 import { getFraudGraph, getFraudPackages } from '../api.js'
 import { useTheme } from '../theme.js'
+import { useLang, t } from '../i18n.js'
 
 const TYPE_COLOR = {
   victim: '#4dabf7',
@@ -18,6 +19,10 @@ const TYPE_LABEL = {
   victim: 'Victim', scammer_phone: 'Scammer number', mule_account: 'Mule account',
   device: 'Device', voip_gateway: 'VoIP gateway', kingpin: 'Kingpin / hub wallet',
 }
+const TYPE_LABEL_HI = {
+  victim: 'पीड़ित', scammer_phone: 'घोटालेबाज़ नंबर', mule_account: 'म्यूल खाता',
+  device: 'डिवाइस', voip_gateway: 'VoIP गेटवे', kingpin: 'किंगपिन / हब वॉलेट',
+}
 
 export default function FraudGraph() {
   const [data, setData] = useState(null)
@@ -28,6 +33,7 @@ export default function FraudGraph() {
   const fgRef = useRef(null)
   const [dims, setDims] = useState({ w: 600, h: 460 })
   const theme = useTheme()
+  useLang()
   const light = theme === 'light'
 
   useEffect(() => {
@@ -53,25 +59,25 @@ export default function FraudGraph() {
 
   return (
     <>
-      <PageHeader title="Fraud Network" accent="Graph Intelligence"
-        subtitle="Clusters victims, mule accounts and spoofed numbers into coordinated rings" />
+      <PageHeader title={t('Fraud Network', 'फ्रॉड नेटवर्क')} accent={t('Graph Intelligence', 'ग्राफ़ इंटेलिजेंस')}
+        subtitle={t('Clusters victims, mule accounts and spoofed numbers into coordinated rings', 'पीड़ितों, म्यूल खातों और स्पूफ़ नंबरों को समन्वित रिंग में समूहित करता है')} />
       <div className="p-4 md:p-8 grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 rounded-xl border border-white/8 bg-ink-700 overflow-hidden">
           <div className="px-5 py-3 border-b border-white/8 flex items-center justify-between flex-wrap gap-2">
             <h3 className="font-display font-600 text-white flex items-center gap-2">
-              <Network size={18} className="text-brand" /> Entity graph
+              <Network size={18} className="text-brand" /> {t('Entity graph', 'एंटिटी ग्राफ़')}
             </h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(TYPE_LABEL).map(([k, v]) => (
                 <span key={k} className="text-[11px] text-gray-400 flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: TYPE_COLOR[k] }} /> {v}
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: TYPE_COLOR[k] }} /> {t(v, TYPE_LABEL_HI[k])}
                 </span>
               ))}
             </div>
           </div>
           <div ref={wrapRef} className="h-[460px] relative">
             {err && <div className="p-6 text-red-400 text-sm">{err}</div>}
-            {!data && !err && <div className="p-6"><Spinner label="Building graph…" /></div>}
+            {!data && !err && <div className="p-6"><Spinner label={t('Building graph…', 'ग्राफ़ बन रहा है…')} /></div>}
             {data && (
               <ForceGraph2D
                 ref={fgRef}
@@ -106,7 +112,7 @@ export default function FraudGraph() {
             {hover && (
               <div className="absolute top-3 left-3 bg-ink-900/95 border border-white/10 rounded-lg p-3 text-xs max-w-[220px]">
                 <div className="font-600 text-white">{hover.label}</div>
-                <div className="text-gray-400">{TYPE_LABEL[hover.type]} · {hover.location}</div>
+                <div className="text-gray-400">{t(TYPE_LABEL[hover.type], TYPE_LABEL_HI[hover.type])} · {hover.location}</div>
                 {hover.loss > 0 && <div className="text-red-400 mt-1">Loss ₹{(hover.loss / 100000).toFixed(1)}L</div>}
                 <div className="text-gray-500 mt-1">risk {Math.round(hover.risk * 100)}%</div>
               </div>
@@ -115,7 +121,7 @@ export default function FraudGraph() {
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-display font-600 text-white text-lg">Intelligence packages</h3>
+          <h3 className="font-display font-600 text-white text-lg">{t('Intelligence packages', 'इंटेलिजेंस पैकेज')}</h3>
           {packages.map((p) => (
             <div key={p.campaign_id} className="rounded-xl border border-white/8 bg-ink-700 p-5">
               <div className="flex items-center justify-between">
@@ -123,21 +129,21 @@ export default function FraudGraph() {
                 <RiskBadge level={p.priority} />
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                <Metric icon={Users} label="Victims" value={p.victim_count} />
-                <Metric icon={CreditCard} label="Mule a/cs" value={p.mule_account_count} />
-                <Metric icon={Phone} label="Numbers" value={p.scammer_number_count} />
-                <Metric icon={AlertOctagon} label="Nodes" value={p.node_count} />
+                <Metric icon={Users} label={t('Victims', 'पीड़ित')} value={p.victim_count} />
+                <Metric icon={CreditCard} label={t('Mule a/cs', 'म्यूल खाते')} value={p.mule_account_count} />
+                <Metric icon={Phone} label={t('Numbers', 'नंबर')} value={p.scammer_number_count} />
+                <Metric icon={AlertOctagon} label={t('Nodes', 'नोड्स')} value={p.node_count} />
               </div>
               <div className="mt-3 text-sm">
-                <span className="text-gray-400">Reported loss </span>
+                <span className="text-gray-400">{t('Reported loss', 'रिपोर्ट हानि')} </span>
                 <span className="text-red-400 font-700">₹{(p.total_reported_loss_inr / 100000).toFixed(1)} L</span>
               </div>
               <div className="mt-1 text-xs text-gray-500">
-                Jurisdictions: {p.jurisdictions_spanned.join(', ')}
+                {t('Jurisdictions', 'क्षेत्राधिकार')}: {p.jurisdictions_spanned.join(', ')}
               </div>
               {p.shared_infrastructure && (
                 <div className="mt-3 text-xs bg-red-500/10 text-red-300 border border-red-500/30 rounded px-2 py-1.5">
-                  ⚠ Shared mule infrastructure detected — single coordinated network
+                  {t('⚠ Shared mule infrastructure detected — single coordinated network', '⚠ साझा म्यूल अवसंरचना पाई गई — एकल समन्वित नेटवर्क')}
                 </div>
               )}
               <ul className="mt-3 space-y-1.5">

@@ -3,6 +3,7 @@ import { FileText, ShieldAlert, ListChecks, Languages, Sparkles } from 'lucide-r
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner, Select } from '../components/ui.jsx'
 import { analyzeScam, getScamSamples, getLlmStatus } from '../api.js'
+import { useLang, t } from '../i18n.js'
 
 const LANGS = [
   ['en', 'English'], ['hi', 'हिन्दी'], ['ta', 'தமிழ்'],
@@ -89,6 +90,7 @@ export default function ScamDetector() {
   const [loading, setLoading] = useState(false)
   const [useAi, setUseAi] = useState(false)
   const [llm, setLlm] = useState(null)
+  useLang()
 
   useEffect(() => {
     getScamSamples().then((d) => {
@@ -108,29 +110,29 @@ export default function ScamDetector() {
 
   return (
     <>
-      <PageHeader title="Digital Arrest" accent="Detector"
-        subtitle="Real-time, explainable classification of scam scripts — with an auditable evidence trail" />
+      <PageHeader title={t('Digital Arrest', 'डिजिटल अरेस्ट')} accent={t('Detector', 'डिटेक्टर')}
+        subtitle={t('Real-time, explainable classification of scam scripts — with an auditable evidence trail', 'घोटाला स्क्रिप्ट का रियल-टाइम, व्याख्यायोग्य वर्गीकरण — एक ऑडिट-योग्य साक्ष्य ट्रेल के साथ')} />
       <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
             <div className="flex items-center justify-between mb-3">
               <label className="text-sm font-600 text-gray-300 flex items-center gap-2">
-                <FileText size={16} className="text-brand" /> Message / call transcript
+                <FileText size={16} className="text-brand" /> {t('Message / call transcript', 'संदेश / कॉल ट्रांसक्रिप्ट')}
               </label>
             </div>
             <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8}
-              className="w-full bg-ink-900 border border-white/10 rounded-lg p-4 text-sm focus:outline-none focus:border-brand resize-none"
-              placeholder="Paste the suspicious message or call transcript…" />
+              className="w-full bg-ink-900 border border-ink-500 rounded-lg p-4 text-sm focus:outline-none focus:border-brand resize-none"
+              placeholder={t('Paste the suspicious message or call transcript…', 'संदिग्ध संदेश या कॉल ट्रांसक्रिप्ट पेस्ट करें…')} />
 
             <div className="grid grid-cols-2 gap-3 mt-4">
               <div>
-                <label className="text-xs text-gray-500">Channel</label>
-                <Select className="mt-1" value={channel} onChange={setChannel} options={CHANNELS} />
+                <label className="h-5 flex items-center gap-1 text-xs text-gray-500 mb-1">{t('Channel', 'चैनल')}</label>
+                <Select value={channel} onChange={setChannel} options={CHANNELS} />
               </div>
               <div>
-                <label className="text-xs text-gray-500 flex items-center gap-1"><Languages size={12} /> Advisory language</label>
-                <Select className="mt-1" value={language} onChange={setLanguage}
+                <label className="h-5 flex items-center gap-1 text-xs text-gray-500 mb-1"><Languages size={12} /> {t('Advisory language', 'सलाह भाषा')}</label>
+                <Select value={language} onChange={setLanguage}
                   options={LANGS.map(([c, n]) => ({ value: c, label: n }))} />
               </div>
             </div>
@@ -138,8 +140,8 @@ export default function ScamDetector() {
             <label className={`mt-4 flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 cursor-pointer transition-colors ${useAi ? 'border-brand/50 bg-brand/10' : 'border-white/10 bg-ink-900'} ${llm && !llm.available ? 'opacity-60' : ''}`}>
               <span className="flex items-center gap-2 text-sm text-gray-200">
                 <Sparkles size={16} className="text-brand" />
-                Gemini AI deep analysis
-                {llm && !llm.available && <span className="text-[10px] text-gray-500">(set GEMINI_API_KEY to enable)</span>}
+                {t('Gemini AI deep analysis', 'जेमिनी AI गहन विश्लेषण')}
+                {llm && !llm.available && <span className="text-[10px] text-gray-500">{t('(set GEMINI_API_KEY to enable)', '(सक्षम करने हेतु GEMINI_API_KEY सेट करें)')}</span>}
                 {llm?.available && <span className="text-[10px] text-emerald-400">● {llm.model}</span>}
               </span>
               <input type="checkbox" checked={useAi} disabled={llm && !llm.available}
@@ -148,12 +150,12 @@ export default function ScamDetector() {
 
             <button onClick={run} disabled={loading}
               className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-60 text-black font-700 py-3 rounded transition-colors">
-              {loading ? 'Analysing…' : 'Analyse threat'}
+              {loading ? t('Analysing…', 'विश्लेषण हो रहा है…') : t('Analyse threat', 'खतरे का विश्लेषण करें')}
             </button>
           </div>
 
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
-            <div className="text-xs font-600 text-gray-400 uppercase tracking-wider mb-3">Load a sample scenario</div>
+            <div className="text-xs font-600 text-gray-400 uppercase tracking-wider mb-3">{t('Load a sample scenario', 'एक नमूना परिदृश्य लोड करें')}</div>
             <div className="space-y-2">
               {samples.map((s, i) => (
                 <button key={i} onClick={() => { setText(s.text); setChannel(s.channel); setRes(null) }}
@@ -203,7 +205,7 @@ export default function ScamDetector() {
               {res.tactics_detected?.length > 0 && (
                 <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
                   <h3 className="font-display font-600 text-white flex items-center gap-2 mb-3">
-                    <ShieldAlert size={18} className="text-brand" /> Tactics detected
+                    <ShieldAlert size={18} className="text-brand" /> {t('Tactics detected', 'पहचानी गई युक्तियाँ')}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {res.tactics_detected.map((t) => (
@@ -214,7 +216,7 @@ export default function ScamDetector() {
               )}
 
               <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
-                <h3 className="font-display font-600 text-white mb-3">Evidence — flagged language</h3>
+                <h3 className="font-display font-600 text-white mb-3">{t('Evidence — flagged language', 'साक्ष्य — चिह्नित भाषा')}</h3>
                 <div className="bg-ink-900 border border-white/10 rounded-lg p-4 text-sm text-gray-300 max-h-56 overflow-auto">
                   <Highlighted text={text} spans={res.highlighted} />
                 </div>
@@ -222,7 +224,7 @@ export default function ScamDetector() {
 
               {res.signals?.length > 0 && (
                 <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
-                  <h3 className="font-display font-600 text-white mb-3">Auditable signal log</h3>
+                  <h3 className="font-display font-600 text-white mb-3">{t('Auditable signal log', 'ऑडिट-योग्य सिग्नल लॉग')}</h3>
                   <div className="space-y-2 max-h-60 overflow-auto">
                     {res.signals.map((sig, i) => (
                       <div key={i} className="flex items-start gap-3 text-sm border-b border-white/5 pb-2">
@@ -239,7 +241,7 @@ export default function ScamDetector() {
 
               <div className="rounded-xl border border-brand/30 bg-brand/5 p-5">
                 <h3 className="font-display font-600 text-white flex items-center gap-2 mb-3">
-                  <ListChecks size={18} className="text-brand" /> Recommended actions
+                  <ListChecks size={18} className="text-brand" /> {t('Recommended actions', 'अनुशंसित कार्रवाई')}
                 </h3>
                 <ol className="space-y-2">
                   {res.recommended_actions.map((a, i) => (
@@ -255,7 +257,7 @@ export default function ScamDetector() {
           {!res && !loading && (
             <div className="rounded-xl border border-dashed border-white/10 bg-ink-700/50 p-10 text-center text-gray-500">
               <ShieldAlert size={40} className="mx-auto mb-3 text-gray-600" />
-              Load a sample or paste a message, then hit <span className="text-brand">Analyse threat</span>.
+              {t('Load a sample or paste a message, then hit', 'एक नमूना लोड करें या संदेश पेस्ट करें, फिर दबाएँ')} <span className="text-brand">{t('Analyse threat', 'खतरे का विश्लेषण')}</span>.
             </div>
           )}
         </div>

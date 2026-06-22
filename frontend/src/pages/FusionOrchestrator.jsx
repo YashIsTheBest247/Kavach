@@ -6,6 +6,7 @@ import {
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner, Select } from '../components/ui.jsx'
 import { orchestrateFusion } from '../api.js'
+import { useLang, t } from '../i18n.js'
 
 const CHANNELS = ['Phone Call', 'Video Call', 'WhatsApp', 'SMS', 'Email']
 const LOCATIONS = ['Bengaluru', 'Delhi NCR', 'Mumbai', 'Pune', 'Chennai', 'Kolkata', 'Hyderabad', 'Jaipur']
@@ -17,6 +18,13 @@ const AGENT_ICON = {
   'Network Correlation Agent': Network,
   'Geo-Context Agent': MapPin,
   'Response Orchestrator Agent': FileText,
+}
+const AGENT_HI = {
+  'Triage Agent': 'ट्रायेज एजेंट',
+  'Orchestrator': 'ऑर्केस्ट्रेटर',
+  'Network Correlation Agent': 'नेटवर्क सहसंबंध एजेंट',
+  'Geo-Context Agent': 'भू-संदर्भ एजेंट',
+  'Response Orchestrator Agent': 'प्रतिक्रिया ऑर्केस्ट्रेटर एजेंट',
 }
 const STATUS_STYLE = {
   done: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
@@ -35,6 +43,7 @@ export default function FusionOrchestrator() {
   const [err, setErr] = useState(null)
   const timers = useRef([])
   const resultRef = useRef(null)
+  useLang()
 
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
@@ -60,43 +69,43 @@ export default function FusionOrchestrator() {
 
   return (
     <>
-      <PageHeader title="Threat Fusion" accent="Orchestrator"
-        subtitle="Agentic multi-source fusion — cooperating agents correlate the scam, fraud ring, geo context & draft the response" />
+      <PageHeader title={t('Threat Fusion', 'थ्रेट फ्यूज़न')} accent={t('Orchestrator', 'ऑर्केस्ट्रेटर')}
+        subtitle={t('Agentic multi-source fusion — cooperating agents correlate the scam, fraud ring, geo context & draft the response', 'एजेंटिक बहु-स्रोत फ्यूज़न — सहयोगी एजेंट घोटाला, फ्रॉड रिंग, भू-संदर्भ जोड़ते हैं और प्रतिक्रिया तैयार करते हैं')} />
       <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
             <label className="text-sm font-600 text-gray-300 flex items-center gap-2 mb-2">
-              <Workflow size={16} className="text-brand" /> Incoming suspicious message
+              <Workflow size={16} className="text-brand" /> {t('Incoming suspicious message', 'आने वाला संदिग्ध संदेश')}
             </label>
             <textarea value={text} onChange={(e) => setText(e.target.value)} rows={7}
               className="w-full bg-ink-900 border border-ink-500 rounded-xl p-4 text-sm focus:outline-none focus:border-brand resize-none" />
             <div className="grid grid-cols-2 gap-3 mt-4">
               <div>
-                <label className="text-xs text-gray-500">Channel</label>
+                <label className="text-xs text-gray-500">{t('Channel', 'चैनल')}</label>
                 <Select className="mt-1" value={channel} onChange={setChannel} options={CHANNELS} />
               </div>
               <div>
-                <label className="text-xs text-gray-500">Victim location</label>
+                <label className="text-xs text-gray-500">{t('Victim location', 'पीड़ित का स्थान')}</label>
                 <Select className="mt-1" value={location} onChange={setLocation} options={LOCATIONS} />
               </div>
             </div>
             <button onClick={run} disabled={loading}
               className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-600 disabled:opacity-60 text-black font-700 py-3 rounded transition-colors">
-              {loading ? 'Orchestrating…' : 'Run agent orchestration'}
+              {loading ? t('Orchestrating…', 'ऑर्केस्ट्रेशन हो रहा है…') : t('Run agent orchestration', 'एजेंट ऑर्केस्ट्रेशन चलाएँ')}
             </button>
             {err && <p className="text-red-400 text-sm mt-3">{err}</p>}
           </div>
 
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
-            <div className="text-xs font-600 text-gray-400 uppercase tracking-wider mb-3">The agent chain</div>
+            <div className="text-xs font-600 text-gray-400 uppercase tracking-wider mb-3">{t('The agent chain', 'एजेंट श्रृंखला')}</div>
             <div className="space-y-2 text-sm text-gray-400">
               {['Triage Agent', 'Orchestrator', 'Network Correlation Agent', 'Geo-Context Agent', 'Response Orchestrator Agent'].map((a, i) => {
                 const Icon = AGENT_ICON[a]
                 return (
                   <div key={a} className="flex items-center gap-2">
                     <span className="text-gray-600 font-mono text-xs w-4">{i + 1}</span>
-                    <Icon size={15} className="text-brand" /> {a}
+                    <Icon size={15} className="text-brand" /> {t(a, AGENT_HI[a])}
                   </div>
                 )
               })}
@@ -106,14 +115,14 @@ export default function FusionOrchestrator() {
 
         {/* output */}
         <div ref={resultRef} className="space-y-4 scroll-mt-24">
-          {loading && <div className="rounded-xl border border-white/8 bg-ink-700 p-6"><Spinner label="Dispatching agents…" /></div>}
+          {loading && <div className="rounded-xl border border-white/8 bg-ink-700 p-6"><Spinner label={t('Dispatching agents…', 'एजेंट भेजे जा रहे हैं…')} /></div>}
 
           {res && (
             <>
               {/* agent timeline */}
               <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
                 <h3 className="font-display font-600 text-white mb-4 flex items-center gap-2">
-                  <Cpu size={18} className="text-brand" /> Agent execution trace
+                  <Cpu size={18} className="text-brand" /> {t('Agent execution trace', 'एजेंट निष्पादन ट्रेस')}
                 </h3>
                 <div className="space-y-3">
                   {res.steps.slice(0, visible).map((s, i) => {
@@ -125,7 +134,7 @@ export default function FusionOrchestrator() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-sm font-600 text-white">{s.agent}</span>
+                            <span className="text-sm font-600 text-white">{t(s.agent, AGENT_HI[s.agent])}</span>
                             <span className={`text-[10px] uppercase tracking-wide border rounded px-2 py-0.5 ${STATUS_STYLE[s.status] || STATUS_STYLE.done}`}>
                               {s.status}
                             </span>
@@ -139,7 +148,7 @@ export default function FusionOrchestrator() {
                   {visible < res.steps.length && (
                     <div className="flex items-center gap-2 text-gray-500 text-sm pl-11">
                       <span className="w-3 h-3 border-2 border-brand border-t-transparent rounded-full animate-spin" />
-                      next agent working…
+                      {t('next agent working…', 'अगला एजेंट काम कर रहा है…')}
                     </div>
                   )}
                 </div>
@@ -149,10 +158,9 @@ export default function FusionOrchestrator() {
                 <div className="rounded-xl border border-white/10 bg-ink-700 p-6 fade-in flex items-start gap-3">
                   <CircleSlash className="text-gray-400 shrink-0 mt-0.5" size={20} />
                   <div>
-                    <div className="font-display text-lg font-600 text-white">Not escalated</div>
+                    <div className="font-display text-lg font-600 text-white">{t('Not escalated', 'एस्केलेट नहीं किया गया')}</div>
                     <p className="text-sm text-gray-400 mt-1">
-                      Risk {res.risk_score}/100 is below the escalation gate, so downstream agents were not
-                      mobilised — this is the design that keeps citizen false alarms at zero.
+                      {t('Risk', 'जोखिम')} {res.risk_score}/100 {t('is below the escalation gate, so downstream agents were not mobilised — this is the design that keeps citizen false alarms at zero.', 'एस्केलेशन गेट से कम है, इसलिए डाउनस्ट्रीम एजेंट सक्रिय नहीं हुए — यही डिज़ाइन नागरिक झूठे अलार्म को शून्य रखता है।')}
                     </p>
                   </div>
                 </div>
@@ -164,14 +172,14 @@ export default function FusionOrchestrator() {
                   <div className="rounded-xl border border-brand/40 bg-gradient-to-br from-brand/10 to-transparent p-6">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <RiskBadge level={res.fused_threat_level} />
-                      {res.matched_ring && <span className="text-xs text-gray-400">linked → <span className="text-brand font-600">{res.matched_ring}</span></span>}
+                      {res.matched_ring && <span className="text-xs text-gray-400">{t('linked →', 'जुड़ा →')} <span className="text-brand font-600">{res.matched_ring}</span></span>}
                     </div>
                     <div className="mt-3 flex items-end gap-3">
                       <span className="font-display text-6xl font-700 text-white leading-none">{res.fused_threat_score}</span>
-                      <span className="text-gray-500 mb-1">/ 100 fused threat score</span>
+                      <span className="text-gray-500 mb-1">{t('/ 100 fused threat score', '/ 100 संयुक्त खतरा स्कोर')}</span>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      Fusion of scam risk + fraud-ring linkage + geospatial severity{res.ai_used ? ' + Gemini reasoning' : ''}.
+                      {t('Fusion of scam risk + fraud-ring linkage + geospatial severity', 'घोटाला जोखिम + फ्रॉड-रिंग संबंध + भू-स्थानिक गंभीरता का संयोजन')}{res.ai_used ? t(' + Gemini reasoning', ' + जेमिनी विश्लेषण') : ''}.
                     </p>
                   </div>
 
@@ -185,7 +193,7 @@ export default function FusionOrchestrator() {
           {!res && !loading && (
             <div className="rounded-xl border border-dashed border-white/10 bg-ink-700/50 p-10 text-center text-gray-500">
               <Workflow size={40} className="mx-auto mb-3 text-gray-600" />
-              Run the orchestration to watch the agents correlate signals and draft a coordinated response.
+              {t('Run the orchestration to watch the agents correlate signals and draft a coordinated response.', 'एजेंटों को संकेत जोड़ते और समन्वित प्रतिक्रिया तैयार करते देखने हेतु ऑर्केस्ट्रेशन चलाएँ।')}
             </div>
           )}
         </div>
@@ -201,13 +209,13 @@ function ResponseBundle({ r }) {
       <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
         <div className="flex items-center justify-between">
           <h3 className="font-display font-600 text-white flex items-center gap-2">
-            <FileText size={18} className="text-brand" /> Drafted response — case {r.case_id}
+            <FileText size={18} className="text-brand" /> {t('Drafted response — case', 'तैयार प्रतिक्रिया — केस')} {r.case_id}
           </h3>
         </div>
 
         <div className="mt-4 space-y-3 text-sm">
-          <Block icon={ShieldAlert} title="Citizen alert">{r.citizen_alert}</Block>
-          <Block icon={Phone} title="Telecom action">
+          <Block icon={ShieldAlert} title={t('Citizen alert', 'नागरिक चेतावनी')}>{r.citizen_alert}</Block>
+          <Block icon={Phone} title={t('Telecom action', 'टेलीकॉम कार्रवाई')}>
             {r.telecom_action.recommendation}
             <div className="text-xs text-gray-500 mt-1">Number: {r.telecom_action.number}</div>
           </Block>
@@ -216,20 +224,20 @@ function ResponseBundle({ r }) {
 
       <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
         <h3 className="font-display font-600 text-white flex items-center gap-2 mb-3">
-          <Building2 size={18} className="text-brand" /> MHA / NCRP preliminary report
+          <Building2 size={18} className="text-brand" /> {t('MHA / NCRP preliminary report', 'MHA / NCRP प्रारंभिक रिपोर्ट')}
         </h3>
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-          <Field k="Case ID" v={m.case_id} />
-          <Field k="Category" v={m.category} />
-          <Field k="Channel" v={m.channel} />
-          <Field k="Linked ring" v={m.linked_ring} />
+          <Field k={t('Case ID', 'केस आईडी')} v={m.case_id} />
+          <Field k={t('Category', 'श्रेणी')} v={m.category} />
+          <Field k={t('Channel', 'चैनल')} v={m.channel} />
+          <Field k={t('Linked ring', 'जुड़ी रिंग')} v={m.linked_ring} />
         </div>
         <div className="mt-3">
-          <div className="text-xs text-gray-500 mb-1">Modus operandi</div>
+          <div className="text-xs text-gray-500 mb-1">{t('Modus operandi', 'कार्यप्रणाली')}</div>
           <p className="text-sm text-gray-300">{m.modus_operandi}</p>
         </div>
         <div className="mt-3">
-          <div className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Scale size={12} /> Suggested legal sections</div>
+          <div className="text-xs text-gray-500 mb-1 flex items-center gap-1"><Scale size={12} /> {t('Suggested legal sections', 'सुझाई गई कानूनी धाराएँ')}</div>
           <ul className="space-y-1">
             {m.suggested_legal_sections.map((s, i) => (
               <li key={i} className="text-xs text-gray-400 flex gap-2"><span className="text-brand">§</span>{s}</li>
@@ -237,7 +245,7 @@ function ResponseBundle({ r }) {
           </ul>
         </div>
         <div className="mt-3">
-          <div className="text-xs text-gray-500 mb-1 flex items-center gap-1"><ListChecks size={12} /> Priority actions</div>
+          <div className="text-xs text-gray-500 mb-1 flex items-center gap-1"><ListChecks size={12} /> {t('Priority actions', 'प्राथमिकता कार्रवाई')}</div>
           <ol className="space-y-1.5">
             {m.priority_actions.map((a, i) => (
               <li key={i} className="text-sm text-gray-200 flex gap-2">

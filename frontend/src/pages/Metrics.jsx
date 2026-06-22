@@ -3,10 +3,12 @@ import { Target, ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { Spinner } from '../components/ui.jsx'
 import { getMetrics } from '../api.js'
+import { useLang, t } from '../i18n.js'
 
 export default function Metrics() {
   const [m, setM] = useState(null)
   const [err, setErr] = useState(null)
+  useLang()
 
   useEffect(() => {
     getMetrics().then(setM).catch(() => setErr('Backend not reachable on :8000'))
@@ -14,30 +16,28 @@ export default function Metrics() {
 
   return (
     <>
-      <PageHeader title="Measured" accent="Metrics"
-        subtitle="Detectors evaluated on labelled hold-out sets — the numbers that actually save lives" />
+      <PageHeader title={t('Measured', 'मापे गए')} accent={t('Metrics', 'मेट्रिक्स')}
+        subtitle={t('Detectors evaluated on labelled hold-out sets — the numbers that actually save lives', 'लेबल किए गए डेटासेट पर मूल्यांकित डिटेक्टर — वे आँकड़े जो वास्तव में जान बचाते हैं')} />
       <div className="p-4 md:p-8 space-y-8">
         {err && <p className="text-red-400">{err}</p>}
-        {!m && !err && <Spinner label="Running evaluation…" />}
+        {!m && !err && <Spinner label={t('Running evaluation…', 'मूल्यांकन चल रहा है…')} />}
         {m && (
           <>
             <div className="rounded-xl border border-brand/30 bg-gradient-to-r from-brand/10 to-transparent p-5 flex items-start gap-3">
               <Target className="text-brand shrink-0 mt-0.5" size={20} />
               <div className="text-sm text-gray-300">
-                <span className="font-600 text-white">Why these two numbers matter most:</span>{' '}
-                for a citizen-facing tool the <span className="text-emerald-400 font-600">false-positive rate</span> must be near-zero
-                (no false alarms), and for a life-safety tool the <span className="text-red-400 font-600">false-negative rate</span> is
-                the metric that decides whether a scam slips through. Both are reported below, openly.
+                <span className="font-600 text-white">{t('Why these two numbers matter most:', 'ये दो आँकड़े सबसे ज़्यादा क्यों मायने रखते हैं:')}</span>{' '}
+                {t('for a citizen-facing tool the', 'नागरिक-सामना उपकरण के लिए')} <span className="text-emerald-400 font-600">{t('false-positive rate', 'फ़ॉल्स-पॉज़िटिव दर')}</span> {t('must be near-zero (no false alarms), and for a life-safety tool the', 'लगभग शून्य होनी चाहिए (कोई झूठा अलार्म नहीं), और जीवन-सुरक्षा उपकरण के लिए')} <span className="text-red-400 font-600">{t('false-negative rate', 'फ़ॉल्स-नेगेटिव दर')}</span> {t('is the metric that decides whether a scam slips through. Both are reported below, openly.', 'वह आँकड़ा है जो तय करता है कि घोटाला छूट जाएगा या नहीं। दोनों नीचे खुलकर दिए गए हैं।')}
               </div>
             </div>
 
             <MetricBlock data={m.scam} icon={ShieldCheck} highlight="false_positive_rate"
-              highlightLabel="False-positive rate (citizen false alarms)" />
+              highlightLabel={t('False-positive rate (citizen false alarms)', 'फ़ॉल्स-पॉज़िटिव दर (नागरिक झूठे अलार्म)')} />
             <MetricBlock data={m.voice} icon={ShieldCheck} highlight="false_negative_rate"
-              highlightLabel="False-negative rate (deepfakes missed)" />
+              highlightLabel={t('False-negative rate (deepfakes missed)', 'फ़ॉल्स-नेगेटिव दर (छूटे डीपफेक)')} />
             {m.counterfeit && (
               <MetricBlock data={m.counterfeit} icon={ShieldCheck} highlight="false_negative_rate"
-                highlightLabel="False-negative rate (fakes passed as genuine)" />
+                highlightLabel={t('False-negative rate (fakes passed as genuine)', 'फ़ॉल्स-नेगेटिव दर (असली माने गए नकली)')} />
             )}
           </>
         )}
@@ -46,18 +46,25 @@ export default function Metrics() {
   )
 }
 
+const NAME_HI = {
+  'Scam / Digital-Arrest Detection': 'घोटाला / डिजिटल-अरेस्ट डिटेक्शन',
+  'Voice-Spoof / Deepfake Detection': 'वॉइस-स्पूफ़ / डीपफेक डिटेक्शन',
+  'Counterfeit Currency (FICN) Screening': 'नकली मुद्रा (FICN) स्क्रीनिंग',
+}
+
 function MetricBlock({ data, highlight, highlightLabel }) {
   const c = data.confusion
+  const name = t(data.name, NAME_HI[data.name])
   const cards = [
-    ['Accuracy', c.accuracy], ['Precision', c.precision],
-    ['Recall', c.recall], ['F1', c.f1],
+    [t('Accuracy', 'सटीकता'), c.accuracy], [t('Precision', 'प्रिसिज़न'), c.precision],
+    [t('Recall', 'रिकॉल'), c.recall], [t('F1', 'F1'), c.f1],
   ]
   return (
     <div className="rounded-xl border border-white/8 bg-ink-700 p-6">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-5">
-        <h3 className="font-display text-xl font-600 text-white">{data.name}</h3>
+        <h3 className="font-display text-xl font-600 text-white">{name}</h3>
         <span className="text-xs text-gray-500 border border-white/10 rounded-full px-3 py-1">
-          decision: {data.threshold}{data.sample_size ? ` · n=${data.sample_size}` : ` · n=${c.n}`}
+          {t('decision', 'निर्णय')}: {data.threshold}{data.sample_size ? ` · n=${data.sample_size}` : ` · n=${c.n}`}
         </span>
       </div>
 
@@ -82,19 +89,19 @@ function MetricBlock({ data, highlight, highlightLabel }) {
 
         {/* confusion matrix */}
         <div className="rounded-lg bg-ink-900 border border-white/8 p-4">
-          <div className="text-xs text-gray-400 mb-2">Confusion matrix</div>
+          <div className="text-xs text-gray-400 mb-2">{t('Confusion matrix', 'कन्फ्यूज़न मैट्रिक्स')}</div>
           <div className="grid grid-cols-2 gap-2 text-center text-sm">
-            <Cell label="True Positive" v={c.tp} />
-            <Cell label="False Negative" v={c.fn} />
-            <Cell label="False Positive" v={c.fp} />
-            <Cell label="True Negative" v={c.tn} />
+            <Cell label={t('True Positive', 'ट्रू पॉज़िटिव')} v={c.tp} />
+            <Cell label={t('False Negative', 'फ़ॉल्स नेगेटिव')} v={c.fn} />
+            <Cell label={t('False Positive', 'फ़ॉल्स पॉज़िटिव')} v={c.fp} />
+            <Cell label={t('True Negative', 'ट्रू नेगेटिव')} v={c.tn} />
           </div>
         </div>
       </div>
 
       {data.examples && (
         <details className="mt-4">
-          <summary className="text-sm text-brand cursor-pointer">Show sample evaluated items ({data.examples.length})</summary>
+          <summary className="text-sm text-brand cursor-pointer">{t('Show sample evaluated items', 'मूल्यांकित नमूना आइटम दिखाएँ')} ({data.examples.length})</summary>
           <div className="mt-3 space-y-1.5 max-h-64 overflow-auto">
             {data.examples.map((e, i) => (
               <div key={i} className="flex items-center gap-3 text-xs border-b border-white/5 pb-1.5">
