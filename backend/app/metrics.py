@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from app import scam_engine, voice_engine
+from app import scam_engine, voice_engine, counterfeit
 
 
 # label 1 = scam/fraud, 0 = legitimate
@@ -122,5 +122,24 @@ def voice_metrics(n_per_class: int = 20) -> Dict:
             "examples": rows[:12]}
 
 
+def counterfeit_metrics(n_per_class: int = 15) -> Dict:
+    y_true, y_pred, rows = [], [], []
+    for i in range(n_per_class):
+        hard = (i % 5 == 0)   # ~20% hard cases (good fakes / poor genuine photos)
+        for label in ("counterfeit", "genuine"):
+            img, denom, feats = counterfeit.generate_eval_case(label, seed=i * 3 + (1 if label == "genuine" else 0), hard=hard)
+            res = counterfeit.screen_note(img, denom, feats)
+            truth = 1 if label == "counterfeit" else 0
+            pred = 1 if res["counterfeit_risk_score"] >= counterfeit.COUNTERFEIT_THRESHOLD else 0
+            y_true.append(truth)
+            y_pred.append(pred)
+            rows.append({"label": truth, "pred": pred, "score": res["counterfeit_risk_score"],
+                         "hard": hard, "correct": truth == pred, "kind": f"₹{denom} {label}"})
+    cm = _confusion(y_true, y_pred)
+    return {"name": "Counterfeit Currency (FICN) Screening",
+            "threshold": f"counterfeit_risk ≥ {counterfeit.COUNTERFEIT_THRESHOLD}",
+            "confusion": cm, "sample_size": n_per_class * 2, "examples": rows[:12]}
+
+
 def all_metrics() -> Dict:
-    return {"scam": scam_metrics(), "voice": voice_metrics()}
+    return {"scam": scam_metrics(), "voice": voice_metrics(), "counterfeit": counterfeit_metrics()}

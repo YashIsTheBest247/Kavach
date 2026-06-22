@@ -35,6 +35,10 @@ export default function Metrics() {
               highlightLabel="False-positive rate (citizen false alarms)" />
             <MetricBlock data={m.voice} icon={ShieldCheck} highlight="false_negative_rate"
               highlightLabel="False-negative rate (deepfakes missed)" />
+            {m.counterfeit && (
+              <MetricBlock data={m.counterfeit} icon={ShieldCheck} highlight="false_negative_rate"
+                highlightLabel="False-negative rate (fakes passed as genuine)" />
+            )}
           </>
         )}
       </div>

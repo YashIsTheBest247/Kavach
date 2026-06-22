@@ -132,3 +132,62 @@ def screen_note(img_bytes: bytes, denomination: str, confirmed_features: List[st
 
 def feature_catalogue() -> List[Dict]:
     return SECURITY_FEATURES
+
+
+# ---------------------------------------------------------------- evaluation
+COUNTERFEIT_THRESHOLD = 50   # is_counterfeit decision boundary on the 0-100 score
+_FEATURE_KEYS = [f["key"] for f in SECURITY_FEATURES]
+
+
+def _make_note_image(denom: str, quality: str, seed: int) -> bytes:
+    """Synthesise a note-like image with controllable print quality.
+    quality: 'good' (rich intaglio-like detail) | 'flat' (photocopy) | 'lowres'."""
+    import numpy as np
+    from PIL import Image
+    rng = np.random.default_rng(seed)
+    prof = DENOMINATION_PROFILE.get(str(denom), DENOMINATION_PROFILE["500"])
+    ar = prof["aspect_ratio"]
+    base = np.array(prof["rgb_hint"], dtype=float)
+
+    if quality == "good":
+        w = 1200
+        noise_std = 120          # high local detail survives downsampling
+    elif quality == "lowres":
+        w = 260
+        noise_std = 110
+    else:  # flat / photocopy
+        w = 700
+        noise_std = 14
+    h = int(w / ar)
+
+    # blocky texture so variance survives the 64x32 downsample in screen_note
+    bw, bh = max(1, w // 48), max(1, h // 24)
+    blocks = rng.normal(0, noise_std, (h // bh + 1, w // bw + 1, 3))
+    field = np.kron(blocks, np.ones((bh, bw, 1)))[:h, :w, :]
+    img = np.clip(base + field, 0, 255).astype("uint8")
+
+    buf = io.BytesIO()
+    Image.fromarray(img).save(buf, "PNG")
+    return buf.getvalue()
+
+
+def generate_eval_case(label: str, seed: int, hard: bool = False):
+    """Return (img_bytes, denomination, confirmed_features) with known ground truth.
+    label: 'genuine' | 'counterfeit'."""
+    import numpy as np
+    rng = np.random.default_rng(seed + 9000)
+    denom = ["100", "200", "500", "2000"][seed % 4]
+
+    if label == "genuine":
+        if hard:
+            # genuine note but a poor phone photo (tests false positives)
+            return _make_note_image(denom, "flat", seed), denom, list(_FEATURE_KEYS)
+        return _make_note_image(denom, "good", seed), denom, list(_FEATURE_KEYS)
+    else:  # counterfeit
+        if hard:
+            # high-quality fake: decent image + operator confirms several features
+            feats = list(rng.choice(_FEATURE_KEYS, size=4, replace=False))
+            return _make_note_image(denom, "good", seed), denom, feats
+        # crude fake: photocopy + few/no genuine features confirmed
+        feats = list(rng.choice(_FEATURE_KEYS, size=int(rng.integers(0, 2)), replace=False))
+        return _make_note_image(denom, "flat", seed), denom, feats

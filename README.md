@@ -30,6 +30,7 @@ Built with **React + FastAPI**.
 |---|---|---|---|---|---|---|
 | **Scam / Digital-Arrest** (n=36) | 91.7% | 100% | 83.3% | 90.9% | **0%** (no citizen false alarms) | 16.7% |
 | **Voice-Spoof / Deepfake** (n=40) | 90.0% | 83.3% | 100% | 90.9% | 20% | **0%** (no deepfake missed) |
+| **Counterfeit / FICN** (n=30) | 90.0% | 100% | 80.0% | 88.9% | **0%** | 20% (crude fakes caught; high-quality fakes need UV/IR) |
 
 ### Why the detection engine wins on the rubric
 - **Explainable & auditable** — not a black box. Every verdict ships a signal log (matched text, tactic, weight) → defensible for *legal admissibility* (an explicit evaluation focus).
