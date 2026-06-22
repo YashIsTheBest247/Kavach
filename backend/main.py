@@ -5,6 +5,7 @@ FastAPI backend.
 """
 from __future__ import annotations
 
+import os
 from dataclasses import asdict
 from typing import List, Optional
 
@@ -20,9 +21,14 @@ app = FastAPI(
     description="Detect, disrupt and respond to digital fraud, counterfeit currency and digital-arrest scams.",
 )
 
+# CORS allow-list. Default "*" for the demo; set CORS_ORIGINS to a comma-separated
+# list of exact origins (e.g. "https://kavach.vercel.app") to lock it down.
+_cors = os.getenv("CORS_ORIGINS", "*").strip()
+_allow_origins = ["*"] if _cors == "*" else [o.strip() for o in _cors.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allow_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )

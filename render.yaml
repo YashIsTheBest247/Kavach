@@ -17,3 +17,7 @@ services:
       # deterministic engine alone. Set the value in the Render dashboard.
       - key: GEMINI_API_KEY
         sync: false
+      # Optional — lock CORS to your frontend origin(s), comma-separated, no
+      # trailing slash (e.g. https://kavach.vercel.app). Defaults to "*".
+      - key: CORS_ORIGINS
+        sync: false
