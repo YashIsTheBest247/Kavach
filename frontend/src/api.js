@@ -40,8 +40,8 @@ const AUTOMATION_KEY = 'kavach-automation-demo'
 const autoHdr = { headers: { 'X-API-Key': AUTOMATION_KEY } }
 export const rankArticles = (limit = 10) =>
   api.get('/automation/rank', { params: { limit }, ...autoHdr }).then((r) => r.data)
-export const generateReel = (link = null, voice = 'female', publish = false) =>
-  api.post('/automation/generate', { link, voice, publish }, autoHdr).then((r) => r.data)
+export const generateReel = (link = null, voice = 'female', publish = false, language = 'en') =>
+  api.post('/automation/generate', { link, voice, publish, language }, autoHdr).then((r) => r.data)
 export const publishReel = (id) =>
   api.post(`/automation/reels/${id}/publish`, {}, autoHdr).then((r) => r.data)
 export const listReels = () => api.get('/automation/reels', autoHdr).then((r) => r.data)
@@ -49,5 +49,30 @@ export const getReel = (id) => api.get(`/automation/reels/${id}`, autoHdr).then(
 
 export const orchestrateFusion = (payload) =>
   api.post('/fusion/orchestrate', payload).then((r) => r.data)
+
+// ---- API usage + rate-limit dashboard ----
+export const getUsage = () => api.get('/usage').then((r) => r.data)
+
+// ---- Link / QR phishing scanner ----
+export const scanLink = (url) => api.post('/link/scan', { url }).then((r) => r.data)
+
+// ---- Crowdsourced reports + reputation ----
+export const submitReport = (value, reason = '') =>
+  api.post('/report', { value, reason }).then((r) => r.data)
+export const lookupReputation = (value) =>
+  api.get('/reputation', { params: { value } }).then((r) => r.data)
+export const getRecentReports = () => api.get('/reports/recent').then((r) => r.data)
+
+// ---- Deepfake / AI-image screening ----
+export const screenImage = (file) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return api.post('/deepfake/screen', fd).then((r) => r.data)
+}
+
+// ---- Court-admissible PDF report (returns a Blob) ----
+export const scamReportPdf = (text, channel = 'Unknown', language = 'en') =>
+  api.post('/report/scam/pdf', { text, channel, language }, { responseType: 'blob' })
+    .then((r) => r.data)
 
 export default api

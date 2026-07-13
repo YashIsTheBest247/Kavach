@@ -3,6 +3,7 @@ import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
   PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X, Newspaper, Film, Plug,
+  Link2, ScanEye, UserSearch,
 } from 'lucide-react'
 import { Logo, ThemeToggle, LangToggle } from '../components/ui.jsx'
 import { useLang, t } from '../i18n.js'
@@ -12,6 +13,9 @@ const LINKS = [
   { to: '/console/fusion', icon: Workflow, en: 'Threat Fusion (Agentic)', hi: 'थ्रेट फ्यूज़न (एजेंटिक)' },
   { to: '/console/scam-detector', icon: MessageSquareWarning, en: 'Digital Arrest Detector', hi: 'डिजिटल अरेस्ट डिटेक्टर' },
   { to: '/console/voice-spoof', icon: Mic, en: 'Voice-Spoof Detection', hi: 'वॉइस-स्पूफ़ डिटेक्शन' },
+  { to: '/console/deepfake-image', icon: ScanEye, en: 'Deepfake Image Detector', hi: 'डीपफेक छवि डिटेक्टर' },
+  { to: '/console/link-scanner', icon: Link2, en: 'Link / QR Scanner', hi: 'लिंक / QR स्कैनर' },
+  { to: '/console/reputation', icon: UserSearch, en: 'Number / UPI Reputation', hi: 'नंबर / UPI प्रतिष्ठा' },
   { to: '/console/fraud-graph', icon: Network, en: 'Fraud Network Graph', hi: 'फ्रॉड नेटवर्क ग्राफ़' },
   { to: '/console/counterfeit', icon: ScanLine, en: 'Counterfeit Screen', hi: 'नकली नोट स्क्रीनिंग' },
   { to: '/console/fraud-shield', icon: PhoneCall, en: 'Citizen Fraud Shield', hi: 'नागरिक फ्रॉड शील्ड' },

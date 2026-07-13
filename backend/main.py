@@ -18,8 +18,11 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+import time
+
 from app import (scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm,
-                 voice_engine, metrics, orchestrator, news, video_agent, security)
+                 voice_engine, metrics, orchestrator, news, video_agent, security,
+                 link_scanner, reports, ai_image, report_pdf, usage)
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -174,6 +177,54 @@ def geo_hotspots():
     return {"hotspots": geo_stats.hotspots()}
 
 
+# ---------- link / QR phishing scanner ----------
+class LinkRequest(BaseModel):
+    url: str
+
+
+@app.post("/api/link/scan")
+def link_scan(req: LinkRequest):
+    return link_scanner.scan(req.url)
+
+
+# ---------- crowdsourced reports + reputation ----------
+class ReportRequest(BaseModel):
+    value: str
+    reason: Optional[str] = ""
+
+
+@app.post("/api/report")
+def report_submit(req: ReportRequest):
+    return reports.submit(req.value, req.reason or "")
+
+
+@app.get("/api/reputation")
+def reputation(value: str):
+    return reports.reputation(value)
+
+
+@app.get("/api/reports/recent")
+def reports_recent():
+    return {"recent": reports.recent(), "stats": reports.stats()}
+
+
+# ---------- deepfake / AI-image screening ----------
+@app.post("/api/deepfake/screen")
+async def deepfake_screen(file: UploadFile = File(...)):
+    return ai_image.screen(await file.read())
+
+
+# ---------- court-admissible PDF report ----------
+@app.post("/api/report/scam/pdf")
+def scam_pdf(req: ScamRequest):
+    result = scam_engine.analyze_text(req.text)
+    payload = asdict(result)
+    payload["advisory"] = advisory.advisory_for(result.risk_level, req.language or "en")
+    pdf = report_pdf.scam_report(payload, req.text)
+    return Response(content=pdf, media_type="application/pdf",
+                    headers={"Content-Disposition": "attachment; filename=kavach-fraud-report.pdf"})
+
+
 # ============================================================================
 # SURFACE 1 — Awareness-Reel Automation Agent  (/api/automation/*)
 # Key-protected REST API for Economic Times / partners. Ranks trending ET
@@ -196,9 +247,13 @@ def automation_generate(req: GenerateRequest):
     article = None
     if req.link:
         article = next((a for a in video_agent.rank_articles(50) if a["link"] == req.link), None)
+    # Honour the explicit publish flag (default False). Only the unattended cron
+    # (which calls run_pipeline() with no args → None) falls back to
+    # ENABLE_YOUTUBE_UPLOAD. This keeps interactive "Generate" from ever
+    # auto-uploading to YouTube unless the caller explicitly asks to publish.
     return video_agent.run_pipeline(article, voice=req.voice or "female",
                                     language=req.language or "en",
-                                    auto_publish=req.publish or None)
+                                    auto_publish=bool(req.publish))
 
 
 @app.post("/api/automation/reels/{reel_id}/publish", dependencies=[Depends(security.require_automation_key)])
@@ -274,6 +329,13 @@ async def partner_counterfeit(denomination: str = Form("500"),
 @app.get("/api/partner/health", dependencies=[Depends(security.require_partner_key)])
 def partner_health():
     return {"status": "ok", "surface": "partner-detection", "version": "1.0.0"}
+
+
+# ---------- API usage + rate-limit dashboard ----------
+@app.get("/api/usage")
+def api_usage():
+    """Live per-key usage + rate-limit utilisation across both keyed surfaces."""
+    return usage.summary(time.time())
 
 
 # ---------- automation cron (opt-in) ----------

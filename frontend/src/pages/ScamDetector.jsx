@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { FileText, ShieldAlert, ListChecks, Languages, Sparkles } from 'lucide-react'
+import { FileText, ShieldAlert, ListChecks, Languages, Sparkles, FileDown } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner, Select } from '../components/ui.jsx'
-import { analyzeScam, getScamSamples, getLlmStatus } from '../api.js'
+import { analyzeScam, getScamSamples, getLlmStatus, scamReportPdf } from '../api.js'
 import { useLang, t } from '../i18n.js'
 
 const LANGS = [
@@ -90,7 +90,23 @@ export default function ScamDetector() {
   const [loading, setLoading] = useState(false)
   const [useAi, setUseAi] = useState(false)
   const [llm, setLlm] = useState(null)
+  const [pdfLoading, setPdfLoading] = useState(false)
   useLang()
+
+  const downloadPdf = async () => {
+    if (!text.trim()) return
+    setPdfLoading(true)
+    try {
+      const blob = await scamReportPdf(text, channel, language)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'kavach-fraud-report.pdf'
+      document.body.appendChild(a); a.click(); a.remove()
+      URL.revokeObjectURL(url)
+    } catch { /* backend unreachable */ }
+    finally { setPdfLoading(false) }
+  }
 
   useEffect(() => {
     getScamSamples().then((d) => {
@@ -191,6 +207,14 @@ export default function ScamDetector() {
                 <div className="mt-4 rounded-lg bg-ink-900 border border-white/10 p-3 text-sm text-gray-100">
                   {res.advisory}
                 </div>
+                <button onClick={downloadPdf} disabled={pdfLoading}
+                  className="mt-4 w-full inline-flex items-center justify-center gap-2 border border-brand/40 text-brand hover:bg-brand/10 disabled:opacity-60 font-700 py-2.5 rounded transition-colors">
+                  <FileDown size={16} />
+                  {pdfLoading ? t('Preparing…', 'तैयार हो रहा है…') : t('Download court-admissible PDF report', 'न्यायालय-स्वीकार्य PDF रिपोर्ट डाउनलोड करें')}
+                </button>
+                <p className="mt-2 text-[11px] text-gray-500 text-center">
+                  {t('Timestamped, SHA-256 tamper-evident evidence package.', 'टाइमस्टैम्प्ड, SHA-256 छेड़छाड़-प्रमाण साक्ष्य पैकेज।')}
+                </p>
                 {res.fused_risk_score != null && (
                   <div className="mt-3 text-xs text-gray-400">
                     Fused score (rule 55% + AI 45%):{' '}

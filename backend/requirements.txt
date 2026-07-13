@@ -8,6 +8,13 @@ numpy>=2.0.0
 google-genai>=1.0.0
 python-dotenv>=1.0.0
 APScheduler>=3.10.0
+fpdf2>=2.8.0            # court-admissible PDF reports (/api/report/scam/pdf)
+edge-tts>=7.0.0        # neural reel narration (EN/HI, male/female)
+imageio-ffmpeg>=0.5.0  # bundled ffmpeg: reel render + Telegram voice-note decode
+
+# --- Optional: Telegram Fraud Shield bot (separate process) ---
+# Brings every Kavach engine into Telegram. Run: python -m app.telegram_bot
+#   pip install python-telegram-bot>=22.0    # set TELEGRAM_BOT_TOKEN (from @BotFather)
 
 # --- Optional: local video-render worker + YouTube auto-publish ---
 # Not needed on the free cloud tier; install locally to produce & publish the MP4:

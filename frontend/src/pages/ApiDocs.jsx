@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Plug, ShieldCheck, Film, KeyRound, Copy, Check } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Plug, ShieldCheck, Film, KeyRound, Copy, Check, Users, Activity, Gauge, RefreshCw } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
+import { getUsage } from '../api.js'
 import { useLang, t } from '../i18n.js'
 
 const BASE = (import.meta.env.VITE_API_URL || `${window.location.origin}/api`).replace(/\/$/, '')
@@ -53,6 +54,8 @@ export default function ApiDocs() {
           </div>
         </div>
 
+        <UsagePanel />
+
         {/* tabs */}
         <div className="flex gap-2">
           <button onClick={() => setTab('partner')}
@@ -63,11 +66,78 @@ export default function ApiDocs() {
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-600 border transition-colors ${tab === 'automation' ? 'bg-brand/15 text-brand border-brand/40' : 'text-gray-400 border-white/10 hover:text-white'}`}>
             <Film size={16} /> {t('Awareness Agent', 'जागरूकता एजेंट')}
           </button>
+          <button onClick={() => setTab('citizen')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-600 border transition-colors ${tab === 'citizen' ? 'bg-brand/15 text-brand border-brand/40' : 'text-gray-400 border-white/10 hover:text-white'}`}>
+            <Users size={16} /> {t('Citizen Tools', 'नागरिक उपकरण')}
+          </button>
         </div>
 
-        {tab === 'partner' ? <Partner /> : <Automation />}
+        {tab === 'partner' ? <Partner /> : tab === 'automation' ? <Automation /> : <Citizen />}
       </div>
     </>
+  )
+}
+
+function UsagePanel() {
+  const [u, setU] = useState(null)
+  const load = () => getUsage().then(setU).catch(() => setU({ error: true }))
+  useEffect(() => {
+    load()
+    const iv = setInterval(load, 5000)   // live-refresh every 5s
+    return () => clearInterval(iv)
+  }, [])
+
+  if (!u || u.error) return null
+  return (
+    <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-display font-600 text-white flex items-center gap-2">
+          <Activity size={18} className="text-brand" /> {t('Live API usage', 'लाइव API उपयोग')}
+        </h3>
+        <button onClick={load} className="text-gray-400 hover:text-brand" title="Refresh"><RefreshCw size={15} /></button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        {[
+          [t('Total calls', 'कुल कॉल'), u.total_calls],
+          [t('Active keys', 'सक्रिय कीज़'), u.active_keys],
+          [t('Rate limit', 'दर सीमा'), `${u.rate_limit_per_window}/${u.window_seconds}s`],
+          [t('Rejected (429)', 'अस्वीकृत (429)'), u.total_rejected],
+        ].map(([label, val], i) => (
+          <div key={i} className="rounded-lg bg-ink-900 border border-white/8 p-3">
+            <div className="text-[10px] text-gray-500 uppercase tracking-wider">{label}</div>
+            <div className="font-display text-xl font-700 text-white mt-0.5">{val}</div>
+          </div>
+        ))}
+      </div>
+      {u.keys?.length ? (
+        <div className="space-y-2">
+          {u.keys.map((k, i) => (
+            <div key={i} className="rounded-lg bg-ink-900 border border-white/8 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <code className="text-xs text-brand font-mono">{k.key}</code>
+                <span className="text-xs text-gray-500 flex items-center gap-1">
+                  <Gauge size={12} /> {k.calls_last_window}/{k.rate_limit} · {k.total_calls} {t('total', 'कुल')}
+                  {k.rejected > 0 && <span className="text-red-400">· {k.rejected} 429</span>}
+                </span>
+              </div>
+              <div className="mt-2 h-1.5 rounded-full bg-ink-500 overflow-hidden">
+                <div className={`h-full ${k.utilization >= 0.8 ? 'bg-red-500' : k.utilization >= 0.5 ? 'bg-orange-500' : 'bg-brand'}`}
+                  style={{ width: `${Math.round(k.utilization * 100)}%` }} />
+              </div>
+              {Object.keys(k.top_endpoints || {}).length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {Object.entries(k.top_endpoints).map(([ep, n]) => (
+                    <span key={ep} className="text-[10px] font-mono text-gray-400 bg-white/5 border border-white/8 rounded px-1.5 py-0.5">{ep} · {n}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-500">{t('No API calls yet — hit a keyed endpoint below to see it here live.', 'अभी कोई API कॉल नहीं — नीचे कोई कीड एंडपॉइंट कॉल करें और यहाँ लाइव देखें।')}</p>
+      )}
+    </div>
   )
 }
 
@@ -120,6 +190,52 @@ function Partner() {
   body: JSON.stringify({ text: message, language: "en" })
 });
 const verdict = await res.json();`}</Code>
+      </Card>
+    </div>
+  )
+}
+
+function Citizen() {
+  return (
+    <div className="space-y-5">
+      <Card>
+        <H icon={Users}>Open citizen-safety endpoints</H>
+        <p className="text-sm text-gray-400">
+          Keyless, same-origin endpoints powering the in-app citizen tools — link/QR phishing checks,
+          crowdsourced number/UPI reputation, deepfake-image triage and a court-admissible PDF report.
+        </p>
+        <div className="mt-2">
+          <Endpoint method="POST" path="/link/scan" desc="url → phishing risk + factors" />
+          <Endpoint method="GET" path="/reputation?value=" desc="number/UPI/link reputation" />
+          <Endpoint method="POST" path="/report" desc="crowd-report a fraud contact" />
+          <Endpoint method="GET" path="/reports/recent" desc="live community feed + stats" />
+          <Endpoint method="POST" path="/deepfake/screen" desc="image → AI-generated likelihood" />
+          <Endpoint method="POST" path="/report/scam/pdf" desc="analysis → tamper-evident PDF" />
+        </div>
+      </Card>
+
+      <Card>
+        <H>Example — scan a suspicious link</H>
+        <Code>{`curl -X POST ${BASE}/link/scan \\
+  -H "Content-Type: application/json" \\
+  -d '{"url":"http://sbi-kyc-verify.xyz/login@secure"}'`}</Code>
+        <div className="text-xs text-gray-500">Response (excerpt)</div>
+        <Code>{`{
+  "risk_score": 66,
+  "risk_level": "HIGH",
+  "verdict": "LIKELY PHISHING - DO NOT OPEN",
+  "factors": [ { "factor": "Brand impersonation", "impact": 22, ... } ],
+  "recommended_actions": [ "Do NOT enter any login, OTP, card or UPI details.", ... ]
+}`}</Code>
+      </Card>
+
+      <Card>
+        <H>Example — look up a number's reputation</H>
+        <Code>{`curl "${BASE}/reputation?value=%2B919821000001"`}</Code>
+        <div className="text-xs text-gray-500">Bots too — the Telegram Fraud Shield reuses the same engine</div>
+        <Code>{`# Run the citizen fraud-shield bot (separate process)
+export TELEGRAM_BOT_TOKEN=...   # from @BotFather
+python -m app.telegram_bot`}</Code>
       </Card>
     </div>
   )

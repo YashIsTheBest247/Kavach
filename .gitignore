@@ -26,3 +26,6 @@ backend/secrets/
 # Never commit any real .env
 .env
 **/.env
+
+# Crowdsourced report store
+backend/data/

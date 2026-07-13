@@ -25,32 +25,104 @@ except Exception:
 
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
-_client = None
+# ---------------------------------------------------------------------------
+# API key rotation
+# ---------------------------------------------------------------------------
+# Supply multiple keys to survive per-key quota / rate limits. Any of:
+#   GEMINI_API_KEY, GEMINI_API_KEY_2 ... GEMINI_API_KEY_5   (numbered slots)
+#   GEMINI_API_KEYS = "key1,key2,key3"                       (comma bundle)
+# On a quota / rate-limit / transient error we transparently rotate to the next
+# key and retry; the last key that worked becomes the new starting point.
+_clients: Dict[str, object] = {}       # key -> genai.Client (cached)
+_idx = 0                               # index of the current preferred key
 _init_error: Optional[str] = None
 
 
+def _load_keys() -> list:
+    keys = []
+    for name in ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3",
+                 "GEMINI_API_KEY_4", "GEMINI_API_KEY_5"):
+        v = (os.getenv(name) or "").strip()
+        if v:
+            keys.append(v)
+    for v in (os.getenv("GEMINI_API_KEYS") or "").split(","):
+        v = v.strip()
+        if v:
+            keys.append(v)
+    seen, out = set(), []
+    for k in keys:                     # dedupe, preserve order
+        if k not in seen:
+            seen.add(k); out.append(k)
+    return out
+
+
+def _client_for(key: str):
+    c = _clients.get(key)
+    if c is None:
+        from google import genai       # google-genai SDK
+        c = genai.Client(api_key=key)
+        _clients[key] = c
+    return c
+
+
+def _is_transient(e: Exception) -> bool:
+    """Quota / rate-limit / temporary errors worth rotating keys for."""
+    s = str(e).lower()
+    return any(x in s for x in ("429", "resource_exhausted", "quota", "rate limit",
+                                "rate_limit", "exhausted", "unavailable", "503",
+                                "overloaded", "500", "deadline"))
+
+
 def _get_client():
-    global _client, _init_error
-    if _client is not None:
-        return _client
-    key = os.getenv("GEMINI_API_KEY")
-    if not key:
+    """Current preferred client (back-compat; prefer generate())."""
+    global _idx, _init_error
+    keys = _load_keys()
+    if not keys:
         _init_error = "GEMINI_API_KEY not set"
         return None
     try:
-        from google import genai  # google-genai SDK
-        _client = genai.Client(api_key=key)
-        return _client
+        return _client_for(keys[_idx % len(keys)])
     except Exception as e:  # pragma: no cover
         _init_error = f"google-genai unavailable: {e}"
         return None
 
 
+def generate(contents, config=None, model: Optional[str] = None):
+    """generate_content with automatic key rotation. Returns the response, or
+    None if every configured key failed. Raises nothing — callers degrade."""
+    global _idx, _init_error
+    keys = _load_keys()
+    if not keys:
+        _init_error = "GEMINI_API_KEY not set"
+        return None
+    model = model or MODEL
+    n = len(keys)
+    last_err = None
+    for attempt in range(n):
+        i = (_idx + attempt) % n
+        try:
+            resp = _client_for(keys[i]).models.generate_content(
+                model=model, contents=contents, config=config)
+            _idx = i                    # stick with the key that worked
+            _init_error = None
+            return resp
+        except Exception as e:          # rotate on any error, remember the last
+            last_err = e
+            if not _is_transient(e) and attempt == n - 1:
+                break
+            continue
+    _init_error = f"all {n} Gemini key(s) failed: {last_err}"
+    return None
+
+
 def status() -> Dict:
-    client = _get_client()
+    keys = _load_keys()
+    client = _get_client() if keys else None
     return {
         "available": client is not None,
         "model": MODEL if client is not None else None,
+        "keys_configured": len(keys),
+        "active_key_index": (_idx % len(keys)) + 1 if keys else 0,
         "reason": None if client is not None else _init_error,
     }
 
@@ -80,14 +152,12 @@ Be calibrated: a genuine bank reminder that says "never share your OTP" is NOT a
 
 def analyze(text: str) -> Dict:
     """Run Gemini analysis. Returns {available: False, ...} if not configured."""
-    client = _get_client()
-    if client is None:
-        return {"available": False, "reason": _init_error}
+    if not _load_keys():
+        return {"available": False, "reason": "GEMINI_API_KEY not set"}
 
     try:
         from google.genai import types
-        resp = client.models.generate_content(
-            model=MODEL,
+        resp = generate(
             contents=f"{SYSTEM_PROMPT}\n\n--- MESSAGE TO ANALYSE ---\n{text}",
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -95,6 +165,8 @@ def analyze(text: str) -> Dict:
                 max_output_tokens=600,
             ),
         )
+        if resp is None:
+            return {"available": False, "reason": _init_error}
         raw = (resp.text or "").strip()
         data = _safe_json(raw)
         if data is None:

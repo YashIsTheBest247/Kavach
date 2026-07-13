@@ -73,11 +73,11 @@ def rank_articles(limit: int = 10) -> List[Dict]:
 
 
 # ------------------------------------------------------------------ script
-def build_script(article: Dict) -> Dict:
+def build_script(article: Dict, language: str = "en") -> Dict:
     """~35s narration + timed subtitle segments. Gemini if available, else template."""
-    narration = _gemini_script(article) or _template_script(article)
-    # split into subtitle segments (~1 sentence each), estimate timing @ 2.6 words/sec
-    parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", narration) if p.strip()]
+    narration = _gemini_script(article, language) or _template_script(article, language)
+    # split into subtitle segments (~1 sentence each); handle Hindi danda "।" too.
+    parts = [p.strip() for p in re.split(r"(?<=[.!?।])\s+", narration) if p.strip()]
     segs, t = [], 0.0
     for p in parts:
         dur = max(1.6, round(len(p.split()) / 2.6, 2))
@@ -91,30 +91,41 @@ def _gemini_available() -> bool:
     return llm.status().get("available", False)
 
 
-def _gemini_script(article: Dict) -> Optional[str]:
+def _gemini_script(article: Dict, language: str = "en") -> Optional[str]:
     if not _gemini_available():
         return None
-    prompt = (
-        "You are a public-safety scriptwriter. Write a 30-40 second voice-over script "
-        "(4-6 short sentences, plain spoken English) for a scam-awareness reel based on this "
-        "Economic Times headline. Warn citizens, explain the trick simply, and end with: "
-        "'If in doubt, hang up and call 1930.' Return ONLY the narration text.\n\n"
-        f"Headline: {article['title']}\nSummary: {article.get('summary','')}"
-    )
+    if language == "hi":
+        prompt = (
+            "आप एक जन-सुरक्षा स्क्रिप्ट लेखक हैं। नीचे दी गई इकोनॉमिक टाइम्स हेडलाइन पर आधारित एक "
+            "घोटाला-जागरूकता रील के लिए 30-40 सेकंड की वॉइस-ओवर स्क्रिप्ट लिखें (4-6 छोटे वाक्य, "
+            "सरल बोलचाल की हिन्दी में, देवनागरी लिपि में)। नागरिकों को चेतावनी दें, चाल को सरलता से "
+            "समझाएँ, और अंत में यह वाक्य रखें: 'संदेह हो तो कॉल काट दें और 1930 पर कॉल करें।' "
+            "केवल नैरेशन टेक्स्ट लौटाएँ।\n\n"
+            f"हेडलाइन: {article['title']}\nसारांश: {article.get('summary','')}"
+        )
+    else:
+        prompt = (
+            "You are a public-safety scriptwriter. Write a 30-40 second voice-over script "
+            "(4-6 short sentences, plain spoken English) for a scam-awareness reel based on this "
+            "Economic Times headline. Warn citizens, explain the trick simply, and end with: "
+            "'If in doubt, hang up and call 1930.' Return ONLY the narration text.\n\n"
+            f"Headline: {article['title']}\nSummary: {article.get('summary','')}"
+        )
     try:
-        client = llm._get_client()
-        if client is None:
-            return None
         from google.genai import types
-        r = client.models.generate_content(
-            model=llm.MODEL, contents=prompt,
-            config=types.GenerateContentConfig(temperature=0.6, max_output_tokens=400))
-        return (r.text or "").strip() or None
+        r = llm.generate(contents=prompt,
+                         config=types.GenerateContentConfig(temperature=0.6, max_output_tokens=500))
+        return (r.text or "").strip() or None if r is not None else None
     except Exception:
         return None
 
 
-def _template_script(article: Dict) -> str:
+def _template_script(article: Dict, language: str = "en") -> str:
+    if language == "hi":
+        return (f"यह एक ज़रूरी घोटाला चेतावनी है। {article['title']}। "
+                "ठग डर और जल्दबाज़ी पैदा करते हैं ताकि आप सोचे बिना कदम उठा लें। "
+                "कभी भी OTP, PIN या पासवर्ड साझा न करें, और किसी भी चीज़ को 'वेरिफाई' करने के लिए पैसे न भेजें। "
+                "संदेह हो तो कॉल काट दें और 1930 पर कॉल करें।")
     return (f"Here's a scam alert you need to know about. {article['title']}. "
             f"{article.get('summary','')[:180]} "
             "Fraudsters create urgency and fear to make you act before you think. "
@@ -417,7 +428,7 @@ def run_pipeline(article: Optional[Dict] = None, voice: str = "female",
     folder = os.path.join(MEDIA_DIR, reel_id)
     os.makedirs(folder, exist_ok=True)
 
-    script = build_script(article)
+    script = build_script(article, language=language)
     n_imgs = min(14, max(8, len(script.get("segments", [])) + 2))   # richer, varied visuals
     visuals = fetch_visuals(article, article.get("keywords") or _keywords(article["title"]),
                             n=n_imgs, script=script)

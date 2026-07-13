@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Play, ShieldCheck, Network, ScanLine, MessageSquareWarning, MapPin,
-  PhoneCall, ArrowRight, Mic, Target, Workflow,
+  PhoneCall, ArrowRight, Mic, Target, Workflow, Film, Wand2, Subtitles, TrendingUp, Volume2,
 } from 'lucide-react'
 import { Logo, RiskBadge, ThemeToggle, LangToggle } from '../components/ui.jsx'
 import NewsTicker from '../components/NewsTicker.jsx'
 import { analyzeScam } from '../api.js'
 import { useLang, t } from '../i18n.js'
+import { useReveal } from '../useReveal.js'
 
 const NAV = [
   { en: 'HOME', hi: 'होम', href: '#home' },
   { en: 'FEATURES', hi: 'विशेषताएँ', href: '#features' },
   { en: 'LIVE DEMO', hi: 'लाइव डेमो', href: '#demo' },
+  { en: 'REELS', hi: 'रील्स', href: '#reels' },
   { en: 'NEWS', hi: 'समाचार', to: '/console/news' },
 ]
 
@@ -55,6 +57,7 @@ export default function Landing() {
       <Hero />
       <LiveDemo />
       <Features />
+      <ReelsShowcase />
       <Footer />
     </div>
   )
@@ -162,10 +165,11 @@ function LiveDemo() {
     }
   }
 
+  const headRef = useReveal()
   return (
     <section id="demo" className="bg-ink-900">
       <div className="mx-auto max-w-5xl px-5 py-16 md:py-20">
-        <div className="text-center mb-10">
+        <div ref={headRef} className="reveal text-center mb-10">
           <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-3">{t('Try it now', 'अभी आज़माएँ')}</div>
           <h2 className="font-display text-3xl md:text-4xl font-700 uppercase text-white">
             {t('Paste a suspicious', 'कोई संदिग्ध')} <span className="text-brand">{t('message or call', 'संदेश या कॉल पेस्ट करें')}</span>
@@ -225,15 +229,17 @@ function LiveDemo() {
 }
 
 function Features() {
+  const headRef = useReveal()
+  const gridRef = useReveal({ threshold: 0.1 })
   return (
     <section id="features" className="bg-ink-800 border-y border-white/5">
       <div className="mx-auto max-w-7xl px-5 py-16 md:py-20">
-        <div className="text-center mb-14">
+        <div ref={headRef} className="reveal text-center mb-14">
           <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-3">{t('Capabilities', 'क्षमताएँ')}</div>
           <h2 className="font-display text-3xl md:text-4xl font-700 uppercase text-white">{t('Main Features', 'मुख्य विशेषताएँ')}</h2>
           <div className="mx-auto mt-4 h-1 w-16 bg-brand rounded-full" />
         </div>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div ref={gridRef} className="reveal-stagger grid sm:grid-cols-2 md:grid-cols-3 gap-6">
           {FEATURES.map((f) => (
             <Link key={f.to + f.en} to={f.to}
               className="group rounded-xl border border-white/8 bg-ink-700 p-7 hover:border-brand/50 hover:-translate-y-1 transition-all">
@@ -250,6 +256,103 @@ function Features() {
         </div>
       </div>
     </section>
+  )
+}
+
+function ReelsShowcase() {
+  const steps = [
+    { icon: TrendingUp, en: 'Ranks trending fraud news', hi: 'ट्रेंडिंग फ्रॉड समाचार रैंक करता है' },
+    { icon: Wand2, en: 'AI writes the script', hi: 'AI स्क्रिप्ट लिखता है' },
+    { icon: Volume2, en: 'Neural voice narration', hi: 'न्यूरल आवाज़ नैरेशन' },
+    { icon: Subtitles, en: 'Burned-in subtitles', hi: 'सबटाइटल जोड़े जाते हैं' },
+  ]
+  const copyRef = useReveal()
+  const phoneRef = useReveal({ threshold: 0.2 })
+  return (
+    <section id="reels" className="relative bg-ink-900 overflow-hidden">
+      <div className="absolute inset-0 diag-stripes opacity-40" />
+      <div className="relative mx-auto max-w-7xl px-5 py-16 md:py-24 grid lg:grid-cols-2 gap-12 items-center">
+        {/* copy */}
+        <div ref={copyRef} className="reveal">
+          <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-3 flex items-center gap-2">
+            <Film size={14} /> {t('Awareness Automation Agent', 'जागरूकता ऑटोमेशन एजेंट')}
+          </div>
+          <h2 className="font-display text-3xl md:text-4xl font-700 uppercase text-white leading-tight">
+            {t('Turn fraud news into', 'फ्रॉड समाचार को बदलें')}{' '}
+            <span className="text-brand">{t('scroll-stopping reels', 'ध्यान खींचने वाली रील्स में')}</span>
+          </h2>
+          <p className="text-gray-400 text-sm md:text-[15px] mt-4 leading-relaxed max-w-xl">
+            {t('An autonomous agent ranks the top Economic Times cyber-fraud stories, writes a punchy script, narrates it in a neural voice (English or Hindi, male or female) and renders a fully-subtitled awareness reel — ready to publish. Prevention that scales at the speed of social media.',
+               'एक स्वायत्त एजेंट शीर्ष इकोनॉमिक टाइम्स साइबर-फ्रॉड कहानियों को रैंक करता है, दमदार स्क्रिप्ट लिखता है, उसे न्यूरल आवाज़ (अंग्रेज़ी या हिन्दी, पुरुष या महिला) में सुनाता है और पूरी तरह सबटाइटल जागरूकता रील बनाता है — प्रकाशन के लिए तैयार। सोशल मीडिया की गति से बढ़ता बचाव।')}
+          </p>
+          <div className="mt-7 grid grid-cols-2 gap-3 max-w-md">
+            {steps.map((s) => (
+              <div key={s.en} className="flex items-center gap-2.5 rounded-lg border border-white/8 bg-ink-700 px-3 py-2.5">
+                <span className="grid place-items-center w-8 h-8 shrink-0 rounded-lg bg-brand/15 text-brand"><s.icon size={16} /></span>
+                <span className="text-xs text-gray-300 font-600 leading-tight">{t(s.en, s.hi)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex items-center gap-4 flex-wrap">
+            <Link to="/console/reels"
+              className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-600 text-black font-700 px-7 py-3.5 rounded transition-colors shadow-glow">
+              {t('Generate a reel', 'रील बनाएँ')}
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link to="/console/api" className="text-sm font-600 text-gray-300 hover:text-brand transition-colors">
+              {t('See the automation API →', 'ऑटोमेशन API देखें →')}
+            </Link>
+          </div>
+        </div>
+
+        {/* phone mockup */}
+        <div ref={phoneRef} className="reveal flex justify-center lg:justify-end">
+          <ReelPhone />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ReelPhone() {
+  return (
+    <div className="relative w-[260px] sm:w-[300px]">
+      {/* glow */}
+      <div className="absolute -inset-6 bg-brand/20 blur-3xl rounded-full" />
+      <div className="relative aspect-[9/16] rounded-[2.2rem] border-[6px] border-ink-500 bg-black overflow-hidden shadow-2xl">
+        {/* faux reel background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-ink-700 via-ink-800 to-black" />
+        <div className="absolute inset-0 diag-stripes opacity-30" />
+        {/* notch */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-1.5 rounded-full bg-white/20 z-20" />
+        {/* brand watermark */}
+        <div className="absolute top-6 left-4 z-10">
+          <div className="font-display font-700 text-brand text-lg leading-none">KAVACH AI</div>
+          <div className="text-[8px] tracking-[0.25em] text-white/70 mt-0.5">SCAM AWARENESS</div>
+        </div>
+        {/* centre play pulse */}
+        <div className="absolute inset-0 grid place-items-center z-10">
+          <span className="relative grid place-items-center w-16 h-16 rounded-full border border-brand/60 pulse-ring bg-black/30 backdrop-blur-sm">
+            <Play size={26} className="text-brand fill-brand ml-1" />
+          </span>
+        </div>
+        {/* bottom gradient + subtitle */}
+        <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
+        <div className="absolute inset-x-0 bottom-10 px-4 z-20 text-center">
+          <p className="font-display font-700 text-white text-[15px] leading-snug drop-shadow-lg">
+            {t('“You are under digital arrest” — it’s a SCAM.', '“आप डिजिटल अरेस्ट में हैं” — यह घोटाला है।')}
+          </p>
+        </div>
+        {/* progress bar */}
+        <div className="absolute bottom-4 inset-x-4 h-1 rounded-full bg-white/20 z-20 overflow-hidden">
+          <div className="h-full w-2/3 bg-brand" />
+        </div>
+        {/* live caption chip */}
+        <div className="absolute top-6 right-4 z-20 inline-flex items-center gap-1 rounded-full bg-red-500/90 px-2 py-0.5 text-[9px] font-700 text-white">
+          <Volume2 size={10} /> {t('LIVE', 'लाइव')}
+        </div>
+      </div>
+    </div>
   )
 }
 

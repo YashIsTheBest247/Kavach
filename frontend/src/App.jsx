@@ -13,6 +13,9 @@ import Metrics from './pages/Metrics.jsx'
 import FusionOrchestrator from './pages/FusionOrchestrator.jsx'
 import News from './pages/News.jsx'
 import AwarenessReels from './pages/AwarenessReels.jsx'
+import LinkScanner from './pages/LinkScanner.jsx'
+import ReportLookup from './pages/ReportLookup.jsx'
+import DeepfakeImage from './pages/DeepfakeImage.jsx'
 import ApiDocs from './pages/ApiDocs.jsx'
 
 export default function App() {
@@ -27,6 +30,9 @@ export default function App() {
         <Route path="counterfeit" element={<Counterfeit />} />
         <Route path="fraud-shield" element={<FraudShield />} />
         <Route path="voice-spoof" element={<VoiceSpoof />} />
+        <Route path="link-scanner" element={<LinkScanner />} />
+        <Route path="deepfake-image" element={<DeepfakeImage />} />
+        <Route path="reputation" element={<ReportLookup />} />
         <Route path="crime-map" element={<CrimeMap />} />
         <Route path="metrics" element={<Metrics />} />
         <Route path="news" element={<News />} />

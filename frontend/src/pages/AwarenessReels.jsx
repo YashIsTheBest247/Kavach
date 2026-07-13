@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Film, Sparkles, TrendingUp, Wand2, FileText, Subtitles, Images,
-  Play, Pause, RotateCcw, Download, ExternalLink, RefreshCw, Clock, Mic,
+  Play, Pause, RotateCcw, Download, ExternalLink, RefreshCw, Clock, Mic, Languages,
 } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { Spinner } from '../components/ui.jsx'
@@ -15,6 +15,19 @@ function VoiceToggle({ voice, setVoice, size = '' }) {
         <button key={g} onClick={() => setVoice(g)}
           className={`px-3 py-1.5 text-xs font-600 transition-colors ${voice === g ? 'bg-brand text-black' : 'text-gray-400 hover:text-white'}`}>
           {g === 'female' ? t('Female', 'महिला') : t('Male', 'पुरुष')}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function ReelLangToggle({ reelLang, setReelLang }) {
+  return (
+    <div className="inline-flex rounded-lg border border-white/10 overflow-hidden">
+      {[['en', 'English'], ['hi', 'हिन्दी']].map(([code, label]) => (
+        <button key={code} onClick={() => setReelLang(code)}
+          className={`px-3 py-1.5 text-xs font-600 transition-colors ${reelLang === code ? 'bg-brand text-black' : 'text-gray-400 hover:text-white'}`}>
+          {label}
         </button>
       ))}
     </div>
@@ -42,6 +55,8 @@ export default function AwarenessReels() {
   const [stage, setStage] = useState(0)
   const [err, setErr] = useState(null)
   const [voice, setVoice] = useState('female')
+  const [reelLang, setReelLang] = useState('en')
+  const [elapsed, setElapsed] = useState(0)
   const topRef = useRef(null)
   useLang()
 
@@ -56,16 +71,18 @@ export default function AwarenessReels() {
   const openReel = (r) => { setGen(false); setActive(r); scrollTop() }
 
   const generate = async (link) => {
-    setErr(null); setActive(null); setGen(true); setStage(0); scrollTop()
-    const iv = setInterval(() => setStage((s) => Math.min(STAGES.length - 1, s + 1)), 900)
+    setErr(null); setActive(null); setGen(true); setStage(0); setElapsed(0); scrollTop()
     const started = Date.now()
+    // advance the stage list, then hold on the last stage while ffmpeg renders
+    const iv = setInterval(() => setStage((s) => Math.min(STAGES.length - 1, s + 1)), 1400)
+    const tv = setInterval(() => setElapsed(Math.floor((Date.now() - started) / 1000)), 1000)
     try {
-      const r = await generateReel(link, voice)
+      const r = await generateReel(link, voice, false, reelLang)
       await sleep(Math.max(0, 3800 - (Date.now() - started)))   // let the animation breathe
       setActive(r); scrollTop()
       listReels().then((d) => setReels(d.reels)).catch(() => {})
-    } catch { setErr('Generation failed — is the backend running?') }
-    finally { clearInterval(iv); setGen(false) }
+    } catch { setErr('Generation failed — is the backend running? Rendering can take 1–2 minutes; if it timed out, try again.') }
+    finally { clearInterval(iv); clearInterval(tv); setGen(false) }
   }
 
   return (
@@ -76,7 +93,7 @@ export default function AwarenessReels() {
       <div ref={topRef} className="p-4 md:p-8 space-y-6 scroll-mt-4">
         {/* HERO / GENERATOR */}
         {gen ? (
-          <GeneratingCard stage={stage} />
+          <GeneratingCard stage={stage} elapsed={elapsed} />
         ) : active ? (
           <ActiveReel reel={active} onClose={() => setActive(null)} />
         ) : (
@@ -87,9 +104,15 @@ export default function AwarenessReels() {
               {t('The agent picks the top-ranked Economic Times cyber-fraud story and produces a narrated, subtitled reel — press play to watch it right here.',
                  'एजेंट शीर्ष-रैंक इकोनॉमिक टाइम्स साइबर-फ्रॉड कहानी चुनता है और सुनाई गई, सबटाइटल रील बनाता है — यहीं चलाकर देखें।')}
             </p>
-            <div className="mt-5 flex items-center justify-center gap-3 flex-wrap">
-              <span className="text-xs text-gray-400 flex items-center gap-1"><Mic size={14} /> {t('Voice', 'आवाज़')}</span>
-              <VoiceToggle voice={voice} setVoice={setVoice} />
+            <div className="mt-5 flex items-center justify-center gap-5 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 flex items-center gap-1"><Mic size={14} /> {t('Voice', 'आवाज़')}</span>
+                <VoiceToggle voice={voice} setVoice={setVoice} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 flex items-center gap-1"><Languages size={14} /> {t('Language', 'भाषा')}</span>
+                <ReelLangToggle reelLang={reelLang} setReelLang={setReelLang} />
+              </div>
             </div>
             <button onClick={() => generate(null)}
               className="mt-4 inline-flex items-center gap-2 bg-brand hover:bg-brand-600 text-black font-700 px-7 py-3 rounded transition-colors">
@@ -153,7 +176,10 @@ export default function AwarenessReels() {
 }
 
 /* ---------------- generating animation ---------------- */
-function GeneratingCard({ stage }) {
+function GeneratingCard({ stage, elapsed = 0 }) {
+  const onLast = stage >= STAGES.length - 1
+  const mm = String(Math.floor(elapsed / 60)).padStart(1, '0')
+  const ss = String(elapsed % 60).padStart(2, '0')
   return (
     <div className="rounded-2xl border border-brand/30 bg-gradient-to-br from-brand/10 to-transparent p-8 fade-in">
       <div className="flex flex-col items-center text-center">
@@ -161,16 +187,23 @@ function GeneratingCard({ stage }) {
         <div className="mt-6 font-display text-xl md:text-2xl font-700 text-brand uppercase tracking-wide min-h-[2rem]">
           {t(...STAGES[stage])}
         </div>
+        <div className="mt-2 text-xs text-gray-500 font-mono">{mm}:{ss}</div>
         <div className="mt-5 w-full max-w-md space-y-2">
           {STAGES.map(([en, hi], i) => (
             <div key={i} className={`flex items-center gap-3 text-sm transition-all ${i <= stage ? 'text-gray-200' : 'text-gray-600'}`}>
-              <span className={`w-4 h-4 rounded-full grid place-items-center text-[9px] ${i < stage ? 'bg-brand text-black' : i === stage ? 'border-2 border-brand' : 'border border-white/15'}`}>
-                {i < stage ? '✓' : ''}
+              <span className={`w-4 h-4 rounded-full grid place-items-center text-[9px] ${i < stage || onLast ? 'bg-brand text-black' : i === stage ? 'border-2 border-brand' : 'border border-white/15'}`}>
+                {i < stage || (onLast && i < STAGES.length - 1) ? '✓' : ''}
               </span>
               {t(en, hi)}
             </div>
           ))}
         </div>
+        {onLast && (
+          <div className="mt-5 rounded-lg border border-white/10 bg-ink-900/60 px-4 py-3 text-xs text-gray-400 max-w-md">
+            {t('Encoding the video with real narration and burned-in subtitles — this usually takes 1–2 minutes. Please keep this tab open.',
+               'असली नैरेशन और सबटाइटल के साथ वीडियो एन्कोड हो रहा है — इसमें आमतौर पर 1–2 मिनट लगते हैं। कृपया यह टैब खुला रखें।')}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -324,8 +357,9 @@ function ReelPlayer({ reel }) {
     window.speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(reel.script?.narration || '')
     const g = stRef.current.voice
-    u.lang = lang === 'hi' ? 'hi-IN' : 'en-US'
-    const v = pickVoice(lang === 'hi' ? 'hi' : 'en', g)
+    const rlang = reel.language || lang        // narrate in the reel's own language
+    u.lang = rlang === 'hi' ? 'hi-IN' : 'en-US'
+    const v = pickVoice(rlang === 'hi' ? 'hi' : 'en', g)
     if (v) u.voice = v
     u.rate = 1.0; u.pitch = g === 'female' ? 1.06 : 0.94
     window.speechSynthesis.speak(u)
