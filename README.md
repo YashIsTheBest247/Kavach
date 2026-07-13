@@ -13,20 +13,44 @@ themes**, is fully **responsive**, and carries a live **Economic Times scam-news
 
 ---
 
-##  What's inside (10 capabilities)
+## The Kavach loop: **Detect → Disrupt → Act**
+
+Most tools stop at *detect*. Kavach also **disrupts** the scammer (harvests their intel) and drives a **real-world action** (a filed complaint) — closing the loop from suspicion to enforcement.
+
+### 🔥 Flagship differentiators
+
+| Module | What it does | Why it matters |
+|---|---|---|
+| **Counter-Intel Honeypot** | An AI persona **bait-talks the scammer**, wastes their time and **extracts their UPI / phone / account / links**, auto-filing every identifier into the crowd fraud DB so one engagement protects everyone. Defence turned offence. | Nobody else fights back — it *generates* intelligence, live. |
+| **Video-Call Shield** | Screens the **fake-officer video call** — the flagship digital-arrest vector — frame-by-frame for deepfake signatures, with the caller-verification facts police never give you. | Directly neutralises the exact attack in the problem statement's name. |
+| **One-Tap NCRP Complaint** | Turns any detection into a **ready-to-submit cyber-crime complaint** — auto-classified to the right NCRP category + law, first-person narrative, suspect entities, evidence checklist and a tamper-evident PDF. | Closes **detect → act**: the adoption/impact story. |
+| **Outbreak Early-Warning** | Fuses live scam-news + crowd reports to detect **which scams are spiking right now** and issues national threat-level alerts. | Prevention *before* the next victim — predictive, not reactive. |
+
+### 🧠 Detection & intelligence engines
 
 | Module | What it does | Maps to problem-statement bullet |
 |---|---|---|
-| **Agentic Threat Fusion** | An **orchestrator** that chains cooperating agents (Triage → escalation gate → Network-Correlation → Geo-Context → Response) so the modules act as one brain: on a high-risk scam it links the fraud ring, attaches geo context, computes a **fused threat score** and auto-drafts citizen + telecom + MHA-NCRP responses. Every agent step is auditable. | *Agentic AI for multi-source intelligence fusion* |
-| **Digital Arrest Detector** | Real-time, explainable classifier for scam scripts with an **auditable evidence trail** (every flagged phrase + tactic + weight). 11 tactic categories spanning digital-arrest, KYC/phishing, remote-access, prize/advance-fee, account-compromise. | *Digital Arrest Scam Detection & Alerting* |
-| **Voice-Spoof / Deepfake Detection** | Explainable audio forensics that flags AI-cloned / synthetic voices used in scam calls; ships **built-in labelled demo clips** (synthetic vs human) so it's demoable without audio files. | *Speech AI (voice spoofing & AI-voice detection)* |
-| **Fraud Network Graph** | Clusters victims, mule accounts, spoofed numbers & devices into coordinated rings; emits **intelligence packages** and detects shared infrastructure linking campaigns. | *Fraud Network Graph Intelligence* |
-| **Counterfeit Currency Screen** | Image-forensics + security-feature checklist → calibrated FICN risk score with contributing factors. | *Counterfeit Currency Identification Agent* |
-| **Citizen Fraud Shield** | Multi-channel, **6-language** conversational assistant giving instant verdicts + guided reporting to 1930 / cybercrime.gov.in. | *Citizen Fraud Shield (Multi-channel)* |
+| **Agentic Threat Fusion** | An **orchestrator** chaining cooperating agents (Triage → escalation gate → Network-Correlation → Geo-Context → Response) so modules act as one brain: links the fraud ring, attaches geo context, computes a **fused threat score** and auto-drafts citizen + telecom + MHA-NCRP responses. Every step auditable. | *Agentic AI for multi-source intelligence fusion* |
+| **Digital Arrest Detector** | Real-time, explainable scam-script classifier with an **auditable evidence trail** (every flagged phrase + tactic + weight) → export a **court-admissible SHA-256 PDF** or file a complaint in one tap. | *Digital Arrest Scam Detection & Alerting* |
+| **Voice-Spoof Detection** | Explainable audio forensics flagging AI-cloned / synthetic voices; ships **labelled demo clips** so it's demoable without files. | *Speech AI (voice spoofing & AI-voice detection)* |
+| **Deepfake Image Detector** | Explainable image-forensics triage for fake profile photos / forged IDs (EXIF, high-freq detail, generator geometry, noise). | *Deepfake / synthetic-media detection* |
+| **Link / QR Phishing Scanner** | Explains the tell-tale signs of a malicious link (IP host, punycode, brand typosquat, credential-bait, shorteners) with weighted factors. | *Phishing / malicious-link detection* |
+| **Number / UPI Reputation** | Crowdsourced fraud reports → a live reputation score anyone can look up before trusting a contact; a live community feed. | *Community fraud intelligence* |
+| **Fraud Network Graph** | Clusters victims, mules, spoofed numbers & devices into rings; emits **intelligence packages** and shared-infrastructure links. | *Fraud Network Graph Intelligence* |
+| **Counterfeit Currency Screen** | Image-forensics + security-feature checklist → calibrated FICN risk with contributing factors. | *Counterfeit Currency Identification Agent* |
+| **Citizen Fraud Shield** | Multi-channel, **6-language** assistant giving instant verdicts + guided 1930 reporting. | *Citizen Fraud Shield (Multi-channel)* |
 | **Geospatial Crime Map** | Live hotspot map of fraud complaints & FICN seizures for patrol prioritisation. | *Geospatial Crime Pattern Intelligence* |
-| **Measured Metrics** | Detectors evaluated on **labelled hold-out sets** → precision / recall / F1 / accuracy + the safety-critical **false-positive & false-negative** rates, with confusion matrices. | *Evaluation Focus (precision/recall, very-low FP)* |
-| **Scam News Watch** | Live fraud/cyber-scam/counterfeit coverage from **Economic Times RSS** (keyword-filtered, cached, curated fallback) — plus a scrolling ticker on the landing page. | Situational awareness / threat context |
-| **Command Dashboard** | Unified situational picture: detection volumes, rings tracked, ₹ protected, latency, FP rate. | Cross-cutting fusion layer |
+| **Measured Metrics** | Detectors on **labelled hold-out sets** → precision/recall/F1 + safety-critical FP/FN, with confusion matrices. | *Evaluation Focus (precision/recall, very-low FP)* |
+
+### 📣 Reach, awareness & integration
+
+| Module | What it does |
+|---|---|
+| **Telegram Fraud Shield bot** | Every Kavach engine inside Telegram — send a message/link/photo/voice-note and get a verdict; menu, PDF reports, EN/हिं, on-demand reels. No app install. |
+| **Awareness-Reel Agent** | Autonomously ranks trending ET fraud stories, writes a script (Gemini), narrates it (neural TTS, **EN/Hindi, M/F**), burns subtitles and renders a publish-ready reel — optional YouTube auto-publish + cron. |
+| **Scam News Watch** | Live ET-RSS fraud coverage (keyword-filtered, cached, curated fallback) + landing-page ticker. |
+| **Partner + Automation APIs** | Two key-protected REST surfaces (embed Kavach detection / run the reel agent) with **per-key rate limiting + a live usage dashboard**. |
+| **Command Dashboard** | Unified situational picture: detection volumes, rings tracked, ₹ protected, latency, FP rate. |
 
 ### 📊 Measured performance (on the bundled labelled sets — reproducible at `/console/metrics`)
 | Detector | Accuracy | Precision | Recall | F1 | False-Positive | False-Negative |
@@ -82,7 +106,20 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
            ├── metrics.py         labelled eval sets → precision/recall/FP/FN
            ├── orchestrator.py    agentic fusion chain (triage→correlate→geo→respond)
            ├── news.py            Economic Times RSS fetch + filter + cache + fallback
-           └── llm.py             optional Gemini augmentation (graceful fallback)
+           ├── llm.py             Gemini augmentation + multi-key ROTATION (graceful fallback)
+           │
+           ├── honeypot.py        Counter-Intel: bait persona + scammer-intel harvesting
+           ├── deepfake_video.py  video-call shield: frame-sampled deepfake screening
+           ├── complaint.py       one-tap NCRP complaint draft + tamper-evident PDF
+           ├── outbreak.py        scam-outbreak early-warning (news + reports fusion)
+           ├── link_scanner.py    explainable phishing URL/QR scanner
+           ├── reports.py         crowdsourced fraud reports + number/UPI reputation
+           ├── ai_image.py        deepfake / AI-image forensics triage
+           ├── report_pdf.py      court-admissible SHA-256 evidence PDF
+           ├── video_agent.py     awareness-reel agent (rank→script→TTS→render→publish)
+           ├── security.py        two API-key surfaces (partner / automation)
+           ├── usage.py           per-key rate limiting + usage dashboard
+           └── telegram_bot.py    full Telegram front-end to every engine (separate process)
 ```
 
 - **Frontend:** React 18, React Router, Tailwind (CSS-variable theming), Recharts (dashboard),
@@ -125,6 +162,19 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 | GET | `/api/metrics` | measured precision/recall/FP/FN on labelled sets |
 | POST | `/api/fusion/orchestrate` | run the agentic fusion chain → trace + fused score + drafted response |
 | GET | `/api/geo/hotspots` | geospatial crime hotspots |
+| POST | `/api/link/scan` | phishing URL/QR scan → risk + weighted factors |
+| POST | `/api/report` · GET `/api/reputation` | crowd-report a fraud contact · look up its reputation |
+| GET | `/api/reports/recent` | live community fraud-report feed + stats |
+| POST | `/api/deepfake/screen` | screen an image for AI-generation / manipulation |
+| POST | `/api/report/scam/pdf` | court-admissible SHA-256 evidence PDF |
+| **POST** | **`/api/honeypot/engage`** | **Counter-Intel: advance the honeypot, return bait reply + harvested scammer intel** |
+| **POST** | **`/api/deepfake/video`** | **Video-Call Shield: frame-by-frame deepfake screening of a clip** |
+| **POST** | **`/api/complaint/draft`** · **`/api/complaint/pdf`** | **one-tap NCRP complaint (JSON draft · ready-to-file PDF)** |
+| **GET** | **`/api/outbreak/alerts`** | **scam-outbreak early-warning: spiking scam types + threat level** |
+| GET | `/api/usage` | live per-key API usage + rate-limit utilisation |
+| POST | `/api/automation/*` · `/api/partner/*` | key-protected reel-agent & embeddable-detection surfaces |
+
+> **Telegram:** run `python -m app.telegram_bot` (set `TELEGRAM_BOT_TOKEN`) to expose every engine in chat.
 
 
 ---
@@ -135,6 +185,10 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 - **Fraud-graph & geo data** are realistic **synthetic** datasets modelled on NCRP/RBI reporting patterns — swap in live UPI/CDR/NCRP feeds in production.
 - **News** is live ET RSS, keyword-filtered; when ET has no fresh consumer-scam stories (or is unreachable) it shows curated fallback headlines, flagged in the UI.
 - **Bilingual UI**: all static UI + citizen advisories switch to Hindi. Some **engine-generated prose** (verdict summaries, factor descriptions, fraud-graph findings) is still emitted in English and would need a backend-localization pass for 100% Hindi.
+- **Counter-Intel honeypot** never pays and never shares real data — it only stalls the scammer and extracts *their* identifiers; the Gemini persona degrades to a template offline.
+- **Video-Call Shield** is frame-level forensics (a triage signal for the video-call vector), not a trained video-deepfake CNN — it pairs the score with the decisive caller-verification advice.
+- **One-Tap Complaint** generates a fully-drafted, NCRP-ready complaint + PDF for the citizen to submit; it does **not** auto-file into government systems (no public write API).
+- **Outbreak Early-Warning** is indicative trend-detection from live news + crowd reports, not an official government advisory.
 
 Helpline **1930** · **cybercrime.gov.in**
 

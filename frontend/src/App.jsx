@@ -16,6 +16,10 @@ import AwarenessReels from './pages/AwarenessReels.jsx'
 import LinkScanner from './pages/LinkScanner.jsx'
 import ReportLookup from './pages/ReportLookup.jsx'
 import DeepfakeImage from './pages/DeepfakeImage.jsx'
+import CounterIntel from './pages/CounterIntel.jsx'
+import VideoShield from './pages/VideoShield.jsx'
+import ComplaintFile from './pages/ComplaintFile.jsx'
+import OutbreakAlerts from './pages/OutbreakAlerts.jsx'
 import ApiDocs from './pages/ApiDocs.jsx'
 
 export default function App() {
@@ -32,7 +36,11 @@ export default function App() {
         <Route path="voice-spoof" element={<VoiceSpoof />} />
         <Route path="link-scanner" element={<LinkScanner />} />
         <Route path="deepfake-image" element={<DeepfakeImage />} />
+        <Route path="video-shield" element={<VideoShield />} />
+        <Route path="counter-intel" element={<CounterIntel />} />
         <Route path="reputation" element={<ReportLookup />} />
+        <Route path="outbreak" element={<OutbreakAlerts />} />
+        <Route path="complaint" element={<ComplaintFile />} />
         <Route path="crime-map" element={<CrimeMap />} />
         <Route path="metrics" element={<Metrics />} />
         <Route path="news" element={<News />} />

@@ -75,4 +75,25 @@ export const scamReportPdf = (text, channel = 'Unknown', language = 'en') =>
   api.post('/report/scam/pdf', { text, channel, language }, { responseType: 'blob' })
     .then((r) => r.data)
 
+// ---- Counter-Intel honeypot ----
+export const honeypotPersonas = () => api.get('/honeypot/personas').then((r) => r.data)
+export const honeypotEngage = (conversation, persona = 'confused_elder', language = 'en') =>
+  api.post('/honeypot/engage', { conversation, persona, language }).then((r) => r.data)
+
+// ---- Video-call deepfake shield ----
+export const screenVideo = (file) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return api.post('/deepfake/video', fd, { timeout: 120000 }).then((r) => r.data)
+}
+
+// ---- One-tap NCRP complaint ----
+export const draftComplaint = (payload) =>
+  api.post('/complaint/draft', payload).then((r) => r.data)
+export const complaintPdf = (payload) =>
+  api.post('/complaint/pdf', payload, { responseType: 'blob' }).then((r) => r.data)
+
+// ---- Scam-outbreak early-warning ----
+export const getOutbreakAlerts = () => api.get('/outbreak/alerts').then((r) => r.data)
+
 export default api

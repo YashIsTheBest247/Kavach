@@ -10,11 +10,25 @@ export function getLang() {
   return current
 }
 
-export function setLang(l) {
+function _apply(l) {
   current = l
   try { localStorage.setItem(KEY, l) } catch { /* ignore */ }
   try { document.documentElement.setAttribute('lang', l) } catch { /* ignore */ }
   listeners.forEach((f) => f(l))
+}
+
+export function setLang(l) {
+  if (l === current) return
+  const root = typeof document !== 'undefined' ? document.getElementById('root') : null
+  const reduced = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  if (!root || reduced) { _apply(l); return }
+  // Cross-fade: fade out → swap text while faded → fade back in.
+  root.classList.add('lang-switching')
+  setTimeout(() => {
+    _apply(l)
+    requestAnimationFrame(() => root.classList.remove('lang-switching'))
+  }, 150)
 }
 
 export function toggleLang() {

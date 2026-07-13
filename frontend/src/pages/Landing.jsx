@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   Play, ShieldCheck, Network, ScanLine, MessageSquareWarning, MapPin,
   PhoneCall, ArrowRight, Mic, Target, Workflow, Film, Wand2, Subtitles, TrendingUp, Volume2,
+  Send, X,
 } from 'lucide-react'
 import { Logo, RiskBadge, ThemeToggle, LangToggle } from '../components/ui.jsx'
 import NewsTicker from '../components/NewsTicker.jsx'
@@ -17,6 +18,16 @@ const NAV = [
   { en: 'REELS', hi: 'रील्स', href: '#reels' },
   { en: 'NEWS', hi: 'समाचार', to: '/console/news' },
 ]
+
+// Reliable smooth scroll for in-page nav — works even when the URL hash is
+// already set or you click the same link twice (native anchors don't re-fire).
+function scrollToSection(e, href) {
+  const el = document.getElementById(href.replace('#', ''))
+  if (!el) return
+  e.preventDefault()
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  history.replaceState(null, '', href)   // keep the hash in the URL, no jump
+}
 
 const FEATURES = [
   { icon: Workflow, to: '/console/fusion', en: 'Agentic Threat Fusion', hi: 'एजेंटिक थ्रेट फ्यूज़न',
@@ -59,6 +70,36 @@ export default function Landing() {
       <Features />
       <ReelsShowcase />
       <Footer />
+      <TelegramChat />
+    </div>
+  )
+}
+
+const TELEGRAM_BOT_URL = 'https://t.me/Kavach_support_bot'
+
+function TelegramChat() {
+  const [open, setOpen] = useState(true)
+  return (
+    <div className="fixed z-50 bottom-5 right-5 flex items-center gap-3">
+      {open && (
+        <div className="hidden sm:flex items-center gap-2 rounded-2xl bg-ink-800 border border-white/10 shadow-xl pl-4 pr-2 py-2 fade-in">
+          <div className="text-sm">
+            <div className="text-white font-600 leading-tight">{t('Check a scam on Telegram', 'टेलीग्राम पर घोटाला जाँचें')}</div>
+            <div className="text-[11px] text-gray-500 leading-tight">{t('Every Kavach tool, in chat — free', 'हर कवच टूल, चैट में — मुफ़्त')}</div>
+          </div>
+          <button onClick={() => setOpen(false)} aria-label="Dismiss"
+            className="grid place-items-center w-6 h-6 rounded-full text-gray-500 hover:text-white hover:bg-white/10">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+      <a href={TELEGRAM_BOT_URL} target="_blank" rel="noreferrer"
+        aria-label="Chat with Kavach on Telegram"
+        className="group relative grid place-items-center w-14 h-14 rounded-full shadow-xl transition-transform hover:scale-105"
+        style={{ background: 'linear-gradient(135deg, #2AABEE 0%, #229ED9 100%)' }}>
+        <span className="absolute inset-0 rounded-full pulse-ring" style={{ boxShadow: '0 0 0 0 rgba(42,171,238,0.6)' }} />
+        <Send size={24} className="text-white -ml-0.5 mt-0.5" />
+      </a>
     </div>
   )
 }
@@ -76,7 +117,7 @@ function TopNav() {
                 {t(n.en, n.hi)}
               </Link>
             ) : (
-              <a key={n.en} href={n.href}
+              <a key={n.en} href={n.href} onClick={(e) => scrollToSection(e, n.href)}
                 className="text-xs font-600 tracking-widest text-gray-300 hover:text-brand transition-colors">
                 {t(n.en, n.hi)}
               </a>
@@ -168,7 +209,7 @@ function LiveDemo() {
   const headRef = useReveal()
   return (
     <section id="demo" className="bg-ink-900">
-      <div className="mx-auto max-w-5xl px-5 py-16 md:py-20">
+      <div className="mx-auto max-w-5xl px-5 pt-8 md:pt-10 pb-16 md:pb-20">
         <div ref={headRef} className="reveal text-center mb-10">
           <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-3">{t('Try it now', 'अभी आज़माएँ')}</div>
           <h2 className="font-display text-3xl md:text-4xl font-700 uppercase text-white">
@@ -233,7 +274,7 @@ function Features() {
   const gridRef = useReveal({ threshold: 0.1 })
   return (
     <section id="features" className="bg-ink-800 border-y border-white/5">
-      <div className="mx-auto max-w-7xl px-5 py-16 md:py-20">
+      <div className="mx-auto max-w-7xl px-5 pt-8 md:pt-10 pb-16 md:pb-20">
         <div ref={headRef} className="reveal text-center mb-14">
           <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-3">{t('Capabilities', 'क्षमताएँ')}</div>
           <h2 className="font-display text-3xl md:text-4xl font-700 uppercase text-white">{t('Main Features', 'मुख्य विशेषताएँ')}</h2>
@@ -271,9 +312,9 @@ function ReelsShowcase() {
   return (
     <section id="reels" className="relative bg-ink-900 overflow-hidden">
       <div className="absolute inset-0 diag-stripes opacity-40" />
-      <div className="relative mx-auto max-w-7xl px-5 py-16 md:py-24 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative mx-auto max-w-7xl px-5 pt-2 md:pt-3 pb-16 md:pb-24 grid lg:grid-cols-2 gap-12 items-center">
         {/* copy */}
-        <div ref={copyRef} className="reveal">
+        <div ref={copyRef} className="reveal self-start">
           <div className="text-brand text-xs font-700 tracking-[0.3em] uppercase mb-3 flex items-center gap-2">
             <Film size={14} /> {t('Awareness Automation Agent', 'जागरूकता ऑटोमेशन एजेंट')}
           </div>

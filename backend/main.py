@@ -22,7 +22,8 @@ import time
 
 from app import (scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm,
                  voice_engine, metrics, orchestrator, news, video_agent, security,
-                 link_scanner, reports, ai_image, report_pdf, usage)
+                 link_scanner, reports, ai_image, report_pdf, usage,
+                 honeypot, deepfake_video, complaint, outbreak)
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -212,6 +213,60 @@ def reports_recent():
 @app.post("/api/deepfake/screen")
 async def deepfake_screen(file: UploadFile = File(...)):
     return ai_image.screen(await file.read())
+
+
+# ---------- Counter-Intel honeypot ----------
+class HoneypotRequest(BaseModel):
+    conversation: List[dict]            # [{role:'scammer'|'victim', text:str}, ...]
+    persona: Optional[str] = "confused_elder"
+    language: Optional[str] = "en"
+
+
+@app.get("/api/honeypot/personas")
+def honeypot_personas():
+    return {"personas": honeypot.personas()}
+
+
+@app.post("/api/honeypot/engage")
+def honeypot_engage(req: HoneypotRequest):
+    return honeypot.engage(req.conversation, persona=req.persona or "confused_elder",
+                           lang=req.language or "en")
+
+
+# ---------- video-call deepfake shield ----------
+@app.post("/api/deepfake/video")
+async def deepfake_video_screen(file: UploadFile = File(...)):
+    return deepfake_video.screen_video(await file.read())
+
+
+# ---------- one-tap NCRP complaint ----------
+class ComplaintRequest(BaseModel):
+    text: str
+    channel: Optional[str] = None
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    city: Optional[str] = None
+    amount_lost: Optional[str] = None
+    datetime: Optional[str] = None
+    language: Optional[str] = "en"
+
+
+@app.post("/api/complaint/draft")
+def complaint_draft(req: ComplaintRequest):
+    return complaint.draft(req.model_dump())
+
+
+@app.post("/api/complaint/pdf")
+def complaint_pdf(req: ComplaintRequest):
+    pdf = complaint.draft_pdf(req.model_dump())
+    return Response(content=pdf, media_type="application/pdf",
+                    headers={"Content-Disposition": "attachment; filename=kavach-cybercrime-complaint.pdf"})
+
+
+# ---------- scam-outbreak early-warning ----------
+@app.get("/api/outbreak/alerts")
+def outbreak_alerts():
+    return outbreak.alerts()
 
 
 # ---------- court-admissible PDF report ----------

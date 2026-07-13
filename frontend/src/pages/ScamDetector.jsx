@@ -3,6 +3,8 @@ import { FileText, ShieldAlert, ListChecks, Languages, Sparkles, FileDown } from
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner, Select } from '../components/ui.jsx'
 import { analyzeScam, getScamSamples, getLlmStatus, scamReportPdf } from '../api.js'
+import { Link } from 'react-router-dom'
+import { Gavel } from 'lucide-react'
 import { useLang, t } from '../i18n.js'
 
 const LANGS = [
@@ -207,13 +209,19 @@ export default function ScamDetector() {
                 <div className="mt-4 rounded-lg bg-ink-900 border border-white/10 p-3 text-sm text-gray-100">
                   {res.advisory}
                 </div>
-                <button onClick={downloadPdf} disabled={pdfLoading}
-                  className="mt-4 w-full inline-flex items-center justify-center gap-2 border border-brand/40 text-brand hover:bg-brand/10 disabled:opacity-60 font-700 py-2.5 rounded transition-colors">
-                  <FileDown size={16} />
-                  {pdfLoading ? t('Preparing…', 'तैयार हो रहा है…') : t('Download court-admissible PDF report', 'न्यायालय-स्वीकार्य PDF रिपोर्ट डाउनलोड करें')}
-                </button>
+                <div className="mt-4 grid sm:grid-cols-2 gap-2">
+                  <button onClick={downloadPdf} disabled={pdfLoading}
+                    className="w-full inline-flex items-center justify-center gap-2 border border-brand/40 text-brand hover:bg-brand/10 disabled:opacity-60 font-700 py-2.5 rounded transition-colors">
+                    <FileDown size={16} />
+                    {pdfLoading ? t('Preparing…', 'तैयार…') : t('Evidence PDF', 'साक्ष्य PDF')}
+                  </button>
+                  <Link to="/console/complaint" state={{ text, channel }}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-brand hover:bg-brand-600 text-black font-700 py-2.5 rounded transition-colors">
+                    <Gavel size={16} /> {t('File complaint', 'शिकायत दर्ज')}
+                  </Link>
+                </div>
                 <p className="mt-2 text-[11px] text-gray-500 text-center">
-                  {t('Timestamped, SHA-256 tamper-evident evidence package.', 'टाइमस्टैम्प्ड, SHA-256 छेड़छाड़-प्रमाण साक्ष्य पैकेज।')}
+                  {t('SHA-256 tamper-evident report · one-tap NCRP / 1930 complaint.', 'SHA-256 छेड़छाड़-प्रमाण रिपोर्ट · वन-टैप NCRP / 1930 शिकायत।')}
                 </p>
                 {res.fused_risk_score != null && (
                   <div className="mt-3 text-xs text-gray-400">

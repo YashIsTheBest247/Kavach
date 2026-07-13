@@ -132,7 +132,23 @@ flowchart TD
 | `advisory.py` | Citizen advisories | 6-language verdict messages + sample scenarios |
 | `geo_stats.py` | Geodata + dashboard metrics | Hotspots, scam mix, weekly detections |
 | `news.py` | ET news feed | RSS fetch → keyword filter → cache → curated fallback |
-| `llm.py` | Gemini augmentation | Optional; `available=False` when no key |
+| `llm.py` | Gemini augmentation | Optional; multi-key **rotation** on quota/rate errors; `available=False` when no key |
+
+**Detect → Disrupt → Act extensions:**
+
+| Module | Responsibility | Key idea |
+|---|---|---|
+| `honeypot.py` | Counter-Intel scammer honeypot | AI persona stalls the scammer + regex-harvests UPI/phone/account/links → auto-files to `reports.py` |
+| `deepfake_video.py` | Video-Call Shield | moviepy samples frames across the clip → each screened via `ai_image` → worst-frame-weighted verdict |
+| `complaint.py` | One-tap NCRP complaint | Auto-classifies to NCRP category+law, Gemini/template narrative, entity extraction, tamper-evident PDF |
+| `outbreak.py` | Scam-outbreak early-warning | Fuses `news` + `reports` per scam-family → trend + national threat level |
+| `link_scanner.py` | Phishing URL/QR scanner | Weighted heuristics (IP host, punycode, typosquat, credential-bait, shorteners) |
+| `reports.py` | Crowd reports + reputation | JSON store; normalises phone/UPI/link; saturating reputation score |
+| `ai_image.py` | Deepfake image forensics | EXIF absence, high-freq detail, generator geometry, noise uniformity |
+| `report_pdf.py` | Court-admissible PDF | fpdf2; SHA-256 integrity hash of report contents |
+| `video_agent.py` | Awareness-reel agent | rank → Gemini script (EN/HI) → edge-tts → moviepy render → optional YouTube |
+| `security.py` + `usage.py` | API surfaces | Two X-API-Key gates + per-key sliding-window rate limiting + usage snapshot |
+| `telegram_bot.py` | Telegram front-end | Separate process; menu + auto-routing of text/photo/voice to every engine |
 
 ---
 
