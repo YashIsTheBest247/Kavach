@@ -113,8 +113,10 @@ def _gemini_script(article: Dict, language: str = "en") -> Optional[str]:
         )
     try:
         from google.genai import types
+        # gemini-2.5-flash spends output tokens on hidden "thinking"; give a large
+        # ceiling so the actual narration isn't truncated (was cutting to 1 line).
         r = llm.generate(contents=prompt,
-                         config=types.GenerateContentConfig(temperature=0.6, max_output_tokens=500))
+                         config=types.GenerateContentConfig(temperature=0.6, max_output_tokens=2048))
         return (r.text or "").strip() or None if r is not None else None
     except Exception:
         return None

@@ -2,7 +2,17 @@ import axios from 'axios'
 
 // Dev: Vite proxies /api -> http://localhost:8000 (see vite.config.js).
 // Prod: set VITE_API_URL to the deployed backend, e.g. https://kavach-api.onrender.com/api
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api' })
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
+const api = axios.create({ baseURL: API_BASE })
+
+// Backend origin without the trailing /api (media/static live at the root).
+const BACKEND_ORIGIN = API_BASE.replace(/\/api\/?$/, '')
+
+// CORS-safe image proxy URL (must hit the BACKEND, not the Vercel frontend).
+export const imgProxyUrl = (url) => `${API_BASE}/img?url=${encodeURIComponent(url)}`
+
+// Absolute URL for a backend-served media file (e.g. a rendered reel mp4).
+export const mediaUrl = (path) => `${BACKEND_ORIGIN}/${String(path).replace(/^\//, '')}`
 
 export const analyzeScam = (text, channel, language, useAi = false) =>
   api.post('/scam/analyze', { text, channel, language, use_ai: useAi }).then((r) => r.data)

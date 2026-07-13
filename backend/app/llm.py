@@ -162,7 +162,9 @@ def analyze(text: str) -> Dict:
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 temperature=0.2,
-                max_output_tokens=600,
+                # High ceiling: gemini-2.5-flash's hidden "thinking" also draws
+                # from this budget — too low and the JSON gets truncated.
+                max_output_tokens=2048,
             ),
         )
         if resp is None:

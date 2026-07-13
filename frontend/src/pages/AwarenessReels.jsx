@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { Spinner } from '../components/ui.jsx'
-import { rankArticles, generateReel, listReels, getReel } from '../api.js'
+import { rankArticles, generateReel, listReels, getReel, imgProxyUrl, mediaUrl } from '../api.js'
 import { useLang, t } from '../i18n.js'
 
 function VoiceToggle({ voice, setVoice, size = '' }) {
@@ -290,7 +290,7 @@ function ReelPlayer({ reel }) {
     Promise.all(sources.map((url) => new Promise((res) => {
       const im = new Image(); im.crossOrigin = 'anonymous'
       im.onload = () => res(im); im.onerror = () => res(null)
-      im.src = `/api/img?url=${encodeURIComponent(url)}`
+      im.src = imgProxyUrl(url)
     }))).then((list) => { if (alive) { stRef.current.imgs = list.filter(Boolean); draw(0) } })
     return () => { alive = false; stop(); window.speechSynthesis?.cancel() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -410,7 +410,7 @@ function ReelPlayer({ reel }) {
 
   async function download() {
     if (reel.mp4) {                       // server-rendered MP4 (has audio)
-      const a = document.createElement('a'); a.href = `/${reel.mp4}`; a.download = `${reel.id}.mp4`; a.click(); return
+      const a = document.createElement('a'); a.href = mediaUrl(reel.mp4); a.download = `${reel.id}.mp4`; a.click(); return
     }
     // record the canvas slideshow (visuals + subtitles) to a WebM
     const c = canvasRef.current; if (!c || !c.captureStream) { alert('Recording not supported in this browser.'); return }

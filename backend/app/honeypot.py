@@ -73,7 +73,7 @@ def _gemini_reply(conversation: List[Dict], persona: str, lang: str) -> str:
     try:
         from google.genai import types
         r = llm.generate(contents=prompt,
-                         config=types.GenerateContentConfig(temperature=0.9, max_output_tokens=160))
+                         config=types.GenerateContentConfig(temperature=0.9, max_output_tokens=800))
         return (r.text or "").strip() if r is not None else ""
     except Exception:
         return ""

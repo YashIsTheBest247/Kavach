@@ -79,7 +79,7 @@ def _narrative(text: str, cls: Dict, entities: Dict, victim: Dict, amount: Optio
             f"Suspect identifiers: {entities}\nOriginal message: {text[:600]}"
         )
         r = llm.generate(contents=prompt,
-                         config=types.GenerateContentConfig(temperature=0.4, max_output_tokens=400))
+                         config=types.GenerateContentConfig(temperature=0.4, max_output_tokens=1536))
         return (r.text or "").strip() or tmpl if r is not None else tmpl
     except Exception:
         return tmpl
