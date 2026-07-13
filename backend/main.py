@@ -9,11 +9,17 @@ import os
 from dataclasses import asdict
 from typing import List, Optional
 
-from fastapi import FastAPI, File, Form, UploadFile
+import urllib.parse
+import urllib.request
+
+from fastapi import FastAPI, File, Form, UploadFile, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from app import scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm, voice_engine, metrics, orchestrator, news
+from app import (scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm,
+                 voice_engine, metrics, orchestrator, news, video_agent, security)
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -32,6 +38,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve generated reels (mp4/subtitles) so the app gallery can preview them.
+_media_root = os.path.join(os.path.dirname(__file__), "media")
+os.makedirs(_media_root, exist_ok=True)
+app.mount("/media", StaticFiles(directory=_media_root), name="media")
 
 
 # ---------- models ----------
@@ -161,6 +172,126 @@ def metrics_all():
 @app.get("/api/geo/hotspots")
 def geo_hotspots():
     return {"hotspots": geo_stats.hotspots()}
+
+
+# ============================================================================
+# SURFACE 1 — Awareness-Reel Automation Agent  (/api/automation/*)
+# Key-protected REST API for Economic Times / partners. Ranks trending ET
+# cyber-fraud stories and turns the top one into a narrated, subtitled reel.
+# ============================================================================
+class GenerateRequest(BaseModel):
+    link: Optional[str] = None          # generate from a specific article; else the top-ranked one
+    voice: Optional[str] = "female"     # 'female' | 'male'
+    language: Optional[str] = "en"
+    publish: Optional[bool] = False     # also upload to YouTube if configured
+
+
+@app.get("/api/automation/rank", dependencies=[Depends(security.require_automation_key)])
+def automation_rank(limit: int = 10):
+    return {"ranked": video_agent.rank_articles(limit)}
+
+
+@app.post("/api/automation/generate", dependencies=[Depends(security.require_automation_key)])
+def automation_generate(req: GenerateRequest):
+    article = None
+    if req.link:
+        article = next((a for a in video_agent.rank_articles(50) if a["link"] == req.link), None)
+    return video_agent.run_pipeline(article, voice=req.voice or "female",
+                                    language=req.language or "en",
+                                    auto_publish=req.publish or None)
+
+
+@app.post("/api/automation/reels/{reel_id}/publish", dependencies=[Depends(security.require_automation_key)])
+def automation_publish(reel_id: str):
+    """Manually publish a rendered reel to YouTube (if configured)."""
+    return video_agent.publish_to_youtube(reel_id)
+
+
+@app.get("/api/automation/reels", dependencies=[Depends(security.require_automation_key)])
+def automation_reels():
+    return {"reels": video_agent.list_reels()}
+
+
+_IMG_HOSTS = ("pexels.com", "loremflickr.com", "staticflickr.com", "unsplash.com",
+              "picsum.photos", "wikimedia.org", "wikipedia.org", "imgur.com",
+              "openverse.org", "flickr.com", "stocksnap.io", "pixabay.com", "rawpixel.com")
+
+
+@app.get("/api/img")
+def img_proxy(url: str):
+    """Same-origin, CORS-enabled image proxy so the browser can draw storyboard
+    images onto a <canvas> and record/download the reel without tainting it."""
+    host = urllib.parse.urlparse(url).netloc.lower()
+    if not any(host == h or host.endswith("." + h) for h in _IMG_HOSTS):
+        raise HTTPException(status_code=400, detail="host not allowed")
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (KavachAI)"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = r.read()
+            ct = r.headers.get("Content-Type", "image/jpeg")
+        return Response(content=data, media_type=ct, headers={"Cache-Control": "public, max-age=86400"})
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"image fetch failed: {e}")
+
+
+@app.get("/api/automation/reels/{reel_id}", dependencies=[Depends(security.require_automation_key)])
+def automation_reel(reel_id: str):
+    r = video_agent.get_reel(reel_id)
+    return r or {"error": "not found"}
+
+
+@app.get("/api/automation/reels/{reel_id}/video", dependencies=[Depends(security.require_automation_key)])
+def automation_reel_video(reel_id: str):
+    r = video_agent.get_reel(reel_id)
+    if not r or not r.get("mp4"):
+        return {"error": "video not rendered on this host — run the local worker"}
+    path = os.path.join(os.path.dirname(__file__), r["mp4"])
+    return FileResponse(path, media_type="video/mp4", filename=f"{reel_id}.mp4")
+
+
+# ============================================================================
+# SURFACE 2 — Embeddable Kavach Detection  (/api/partner/*)
+# Separate key. Lets ANY application embed Kavach's detection engines.
+# ============================================================================
+@app.post("/api/partner/scam/analyze", dependencies=[Depends(security.require_partner_key)])
+def partner_scam(req: ScamRequest):
+    return analyze_scam(req)
+
+
+@app.post("/api/partner/voice/analyze", dependencies=[Depends(security.require_partner_key)])
+async def partner_voice(file: UploadFile = File(...)):
+    return voice_engine.analyze_bytes(await file.read())
+
+
+@app.post("/api/partner/counterfeit/screen", dependencies=[Depends(security.require_partner_key)])
+async def partner_counterfeit(denomination: str = Form("500"),
+                              confirmed_features: str = Form(""),
+                              file: UploadFile = File(...)):
+    feats = [f for f in confirmed_features.split(",") if f]
+    return counterfeit.screen_note(await file.read(), denomination, feats)
+
+
+@app.get("/api/partner/health", dependencies=[Depends(security.require_partner_key)])
+def partner_health():
+    return {"status": "ok", "surface": "partner-detection", "version": "1.0.0"}
+
+
+# ---------- automation cron (opt-in) ----------
+@app.on_event("startup")
+def _start_cron():
+    if os.getenv("ENABLE_AUTOMATION_CRON", "0") != "1":
+        return
+    try:
+        from apscheduler.schedulers.background import BackgroundScheduler
+        from apscheduler.triggers.cron import CronTrigger
+        sched = BackgroundScheduler(daemon=True)
+        # default: once a day at 08:00; override with AUTOMATION_CRON (crontab syntax)
+        cron = os.getenv("AUTOMATION_CRON", "0 8 * * *")
+        sched.add_job(video_agent.run_pipeline, CronTrigger.from_crontab(cron))
+        sched.start()
+        app.state.scheduler = sched
+    except Exception as e:  # pragma: no cover
+        print("automation cron not started:", e)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,8 @@ import VoiceSpoof from './pages/VoiceSpoof.jsx'
 import Metrics from './pages/Metrics.jsx'
 import FusionOrchestrator from './pages/FusionOrchestrator.jsx'
 import News from './pages/News.jsx'
+import AwarenessReels from './pages/AwarenessReels.jsx'
+import ApiDocs from './pages/ApiDocs.jsx'
 
 export default function App() {
   return (
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="crime-map" element={<CrimeMap />} />
         <Route path="metrics" element={<Metrics />} />
         <Route path="news" element={<News />} />
+        <Route path="reels" element={<AwarenessReels />} />
+        <Route path="api" element={<ApiDocs />} />
       </Route>
     </Routes>
   )

@@ -54,19 +54,19 @@ export default function BackendGate({ children }) {
 
   const [en, hi] = MESSAGES[idx]
   return (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-white text-center px-6">
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-ink-900 text-center px-6">
       <div className="flex flex-col items-center">
         <div className="w-14 h-14 rounded-full border-[3px] border-brand/25 border-t-brand animate-spin" />
         <div className="mt-8 font-display text-2xl md:text-3xl font-700 text-brand uppercase tracking-wide min-h-[2.2rem] transition-all">
           {t(en, hi)}
         </div>
-        <p className="mt-3 text-sm text-gray-500">
+        <p className="mt-3 text-sm text-gray-400">
           {t('Free-tier server is waking up — this can take up to a minute on first load.',
              'फ्री-टियर सर्वर जाग रहा है — पहली बार लोड में एक मिनट तक लग सकता है।')}
         </p>
         <div className="mt-6 flex items-center gap-1.5">
           {MESSAGES.map((_, i) => (
-            <span key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'w-6 bg-brand' : 'w-1.5 bg-gray-300'}`} />
+            <span key={i} className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'w-6 bg-brand' : 'w-1.5 bg-ink-500'}`} />
           ))}
         </div>
       </div>

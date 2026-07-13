@@ -7,3 +7,11 @@ Pillow>=11.0.0
 numpy>=2.0.0
 google-genai>=1.0.0
 python-dotenv>=1.0.0
+APScheduler>=3.10.0
+
+# --- Optional: local video-render worker + YouTube auto-publish ---
+# Not needed on the free cloud tier; install locally to produce & publish the MP4:
+#   pip install kokoro soundfile moviepy                              # render (needs ffmpeg)
+#   pip install google-api-python-client google-auth-oauthlib google-auth-httplib2   # YouTube upload
+#   + install ffmpeg, set PEXELS_API_KEY (visuals) & GEMINI_API_KEY (script),
+#   run `python -m app.youtube_upload` once for OAuth, then ENABLE_YOUTUBE_UPLOAD=1

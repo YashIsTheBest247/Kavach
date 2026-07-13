@@ -35,6 +35,18 @@ export const analyzeVoice = (file) => {
 }
 export const getMetrics = () => api.get('/metrics').then((r) => r.data)
 
+// ---- Awareness-Reel Automation Agent (demo key) ----
+const AUTOMATION_KEY = 'kavach-automation-demo'
+const autoHdr = { headers: { 'X-API-Key': AUTOMATION_KEY } }
+export const rankArticles = (limit = 10) =>
+  api.get('/automation/rank', { params: { limit }, ...autoHdr }).then((r) => r.data)
+export const generateReel = (link = null, voice = 'female', publish = false) =>
+  api.post('/automation/generate', { link, voice, publish }, autoHdr).then((r) => r.data)
+export const publishReel = (id) =>
+  api.post(`/automation/reels/${id}/publish`, {}, autoHdr).then((r) => r.data)
+export const listReels = () => api.get('/automation/reels', autoHdr).then((r) => r.data)
+export const getReel = (id) => api.get(`/automation/reels/${id}`, autoHdr).then((r) => r.data)
+
 export const orchestrateFusion = (payload) =>
   api.post('/fusion/orchestrate', payload).then((r) => r.data)
 

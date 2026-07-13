@@ -16,3 +16,13 @@ frontend/vite.log
 .DS_Store
 .vscode/
 *.log
+
+# Automation-agent generated reels
+backend/media/
+
+# YouTube OAuth secrets
+backend/secrets/
+
+# Never commit any real .env
+.env
+**/.env

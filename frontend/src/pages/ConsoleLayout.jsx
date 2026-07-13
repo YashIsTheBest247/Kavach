@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { NavLink, Outlet, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, MessageSquareWarning, Network, ScanLine,
-  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X, Newspaper,
+  PhoneCall, MapPin, ArrowLeft, Mic, Target, Workflow, Menu, X, Newspaper, Film, Plug,
 } from 'lucide-react'
 import { Logo, ThemeToggle, LangToggle } from '../components/ui.jsx'
 import { useLang, t } from '../i18n.js'
@@ -18,6 +18,8 @@ const LINKS = [
   { to: '/console/crime-map', icon: MapPin, en: 'Crime Map', hi: 'क्राइम मैप' },
   { to: '/console/metrics', icon: Target, en: 'Measured Metrics', hi: 'मापे गए मेट्रिक्स' },
   { to: '/console/news', icon: Newspaper, en: 'Scam News Watch', hi: 'घोटाला समाचार निगरानी' },
+  { to: '/console/reels', icon: Film, en: 'Awareness Reels', hi: 'जागरूकता रील्स' },
+  { to: '/console/api', icon: Plug, en: 'API & Integrations', hi: 'API और इंटीग्रेशन' },
 ]
 
 export default function ConsoleLayout() {
@@ -53,11 +55,11 @@ export default function ConsoleLayout() {
             <X size={20} />
           </button>
         </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 min-h-0 p-2 space-y-0.5 overflow-y-auto">
           {LINKS.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.end} onClick={() => setOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                   isActive
                     ? 'bg-brand/15 text-brand font-600'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
