@@ -13,11 +13,33 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.7
-      # Optional — enables the Gemini AI layer. Leave unset to run on the
-      # deterministic engine alone. Set the value in the Render dashboard.
+      # Enables the Gemini AI layer (scam reasoning + reel scripts). Leave unset
+      # to run on the deterministic engines alone. Set values in the dashboard.
       - key: GEMINI_API_KEY
+        sync: false
+      # Optional extra Gemini keys — the client auto-rotates to the next one on a
+      # quota / rate-limit (429) error. Fill in the dashboard or delete if unused.
+      - key: GEMINI_API_KEY_2
+        sync: false
+      - key: GEMINI_API_KEY_3
         sync: false
       # Optional — lock CORS to your frontend origin(s), comma-separated, no
       # trailing slash (e.g. https://kavach.vercel.app). Defaults to "*".
       - key: CORS_ORIGINS
         sync: false
+      # Optional — higher-quality stock visuals for the Awareness-Reel agent.
+      # Falls back to free Openverse (no key) if unset.
+      - key: PEXELS_API_KEY
+        sync: false
+      # Telegram Fraud Shield bot. Set the token (from @BotFather) to auto-register
+      # a webhook at <service>/api/telegram/webhook on startup — the bot then works
+      # from the deployed API with no extra process. Uses RENDER_EXTERNAL_URL
+      # (auto-provided) as the base. Leave unset to disable the bot.
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      # Optional — a random string Telegram echoes back to verify webhook calls.
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+      # Optional — override the default Gemini model (defaults to gemini-2.5-flash).
+      # - key: GEMINI_MODEL
+      #   sync: false

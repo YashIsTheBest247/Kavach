@@ -12,7 +12,7 @@ from typing import List, Optional
 import urllib.parse
 import urllib.request
 
-from fastapi import FastAPI, File, Form, UploadFile, Depends, HTTPException
+from fastapi import FastAPI, File, Form, UploadFile, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -23,7 +23,7 @@ import time
 from app import (scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm,
                  voice_engine, metrics, orchestrator, news, video_agent, security,
                  link_scanner, reports, ai_image, report_pdf, usage,
-                 honeypot, deepfake_video, complaint, outbreak)
+                 honeypot, deepfake_video, complaint, outbreak, telegram_bot)
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -391,6 +391,64 @@ def partner_health():
 def api_usage():
     """Live per-key usage + rate-limit utilisation across both keyed surfaces."""
     return usage.summary(time.time())
+
+
+# ============================================================================
+# Telegram Fraud Shield — webhook mode (works on the deployed backend)
+# On startup, if TELEGRAM_BOT_TOKEN + a public base URL are present, the bot is
+# wired up and its webhook is registered at /api/telegram/webhook. Telegram then
+# PUSHES updates here — no always-on polling process needed.
+# ============================================================================
+_tg: dict = {"app": None, "secret": None}
+
+
+@app.on_event("startup")
+async def _start_telegram():
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    # Render auto-provides RENDER_EXTERNAL_URL; else set TELEGRAM_WEBHOOK_URL.
+    base = os.getenv("TELEGRAM_WEBHOOK_URL") or os.getenv("RENDER_EXTERNAL_URL")
+    if not token or not base or os.getenv("ENABLE_TELEGRAM_WEBHOOK", "1") != "1":
+        return
+    try:
+        application = telegram_bot.build_application(token, for_webhook=True)
+        await application.initialize()
+        await application.start()
+        secret = os.getenv("TELEGRAM_WEBHOOK_SECRET") or None
+        url = base.rstrip("/") + "/api/telegram/webhook"
+        # drop_pending_updates=False so messages queued while a free-tier service
+        # was asleep are still delivered when it wakes.
+        await application.bot.set_webhook(
+            url=url, secret_token=secret, drop_pending_updates=False,
+            allowed_updates=["message", "callback_query"])
+        _tg["app"], _tg["secret"] = application, secret
+        print("Telegram webhook registered:", url)
+    except Exception as e:  # pragma: no cover
+        print("telegram webhook not started:", e)
+
+
+@app.on_event("shutdown")
+async def _stop_telegram():
+    application = _tg.get("app")
+    if application:
+        try:
+            await application.stop()
+            await application.shutdown()
+        except Exception:  # pragma: no cover
+            pass
+
+
+@app.post("/api/telegram/webhook")
+async def telegram_webhook(request: Request):
+    application = _tg.get("app")
+    if not application:
+        raise HTTPException(status_code=404, detail="Telegram webhook not enabled")
+    secret = _tg.get("secret")
+    if secret and request.headers.get("X-Telegram-Bot-Api-Secret-Token") != secret:
+        raise HTTPException(status_code=403, detail="bad secret token")
+    from telegram import Update
+    update = Update.de_json(await request.json(), application.bot)
+    await application.process_update(update)
+    return {"ok": True}
 
 
 # ---------- automation cron (opt-in) ----------

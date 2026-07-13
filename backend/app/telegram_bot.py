@@ -23,6 +23,7 @@ from __future__ import annotations
 import asyncio
 import os
 import time
+from datetime import datetime, timezone
 
 from app import (scam_engine, advisory, link_scanner, reports, ai_image,
                  counterfeit, voice_engine, news, geo_stats, report_pdf, video_agent)
@@ -38,6 +39,34 @@ def _bar(score: int) -> str:
 
 def _lang(ctx) -> str:
     return (ctx.user_data or {}).get("lang", "en")
+
+
+async def _wake_ack(update, ctx):
+    """Instant engagement before any heavy work:
+      • always show a 'typing…' indicator so the chat feels alive;
+      • if the server just cold-started (the message has been waiting on a free
+        host that was asleep), send one warm 'thanks for waiting' note so the
+        delay is understood instead of feeling broken.
+    """
+    chat = update.effective_chat
+    if chat is None:
+        return
+    try:
+        await chat.send_action("typing")
+    except Exception:
+        pass
+    msg = update.effective_message
+    try:
+        if msg and msg.date and not ctx.user_data.get("_greeted"):
+            delay = (datetime.now(timezone.utc) - msg.date).total_seconds()
+            if delay > 12:                       # server was likely asleep
+                ctx.user_data["_greeted"] = True
+                await chat.send_message(
+                    "👋 I’m awake now — thanks for your patience! Working on your request…"
+                    if _lang(ctx) != "hi" else
+                    "👋 मैं अब सक्रिय हूँ — धैर्य के लिए धन्यवाद! आपका अनुरोध संभाल रहा हूँ…")
+    except Exception:
+        pass
 
 
 def _to_wav(data: bytes) -> bytes:
@@ -223,13 +252,10 @@ WELCOME = ("🛡️ <b>Kavach Fraud Shield</b>\n\n"
            "Use /menu anytime · /hi for Hindi replies.")
 
 
-# ----------------------------------------------------------------------------- main
-def main():
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token:
-        print("Set TELEGRAM_BOT_TOKEN (from @BotFather) and re-run.")
-        return
-
+# ----------------------------------------------------------------------------- app
+def build_application(token: str, for_webhook: bool = False):
+    """Build the fully-wired PTB Application. Used by both polling (local) and
+    webhook (deployed, via FastAPI) modes."""
     from telegram import Update
     from telegram.ext import (Application, CommandHandler, MessageHandler,
                               CallbackQueryHandler, filters, ContextTypes)
@@ -299,15 +325,16 @@ def main():
         await update.message.reply_text(fmt_scam(text, lang), parse_mode="HTML", reply_markup=_pdf_button())
 
     async def on_text(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+        await _wake_ack(update, ctx)
         await route_text(update, ctx, update.message.text or "")
 
     async def on_photo(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+        await _wake_ack(update, ctx)
         mode = ctx.user_data.get("mode")
         photo = update.message.photo[-1] if update.message.photo else None
         doc = update.message.document
         f = await (photo.get_file() if photo else doc.get_file())
         data = bytes(await f.download_as_bytearray())
-        await update.message.chat.send_action("typing")
         if mode == "counterfeit":
             denom = ctx.user_data.get("denom", "500")
             await update.message.reply_text(fmt_counterfeit(data, denom), parse_mode="HTML", reply_markup=_menu_button())
@@ -315,10 +342,10 @@ def main():
             await update.message.reply_text(fmt_deepfake(data), parse_mode="HTML", reply_markup=_menu_button())
 
     async def on_voice(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+        await _wake_ack(update, ctx)
         v = update.message.voice or update.message.audio
         f = await v.get_file()
         data = bytes(await f.download_as_bytearray())
-        await update.message.chat.send_action("typing")
         await update.message.reply_text(fmt_voice(data), parse_mode="HTML", reply_markup=_menu_button())
 
     async def do_reel(update, ctx):
@@ -387,7 +414,10 @@ def main():
                 await q.message.reply_document(bio, filename="kavach-fraud-report.pdf",
                                                caption="📄 Court-admissible report (SHA-256 tamper-evident).")
 
-    app = Application.builder().token(token).build()
+    builder = Application.builder().token(token)
+    if for_webhook:
+        builder = builder.updater(None)   # no polling updater in webhook mode
+    app = builder.build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("menu", menu))
     app.add_handler(CommandHandler("help", help_cmd))
@@ -407,7 +437,16 @@ def main():
     app.add_handler(MessageHandler(filters.PHOTO | filters.Document.IMAGE, on_photo))
     app.add_handler(MessageHandler(filters.VOICE | filters.AUDIO, on_voice))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text))
+    return app
 
+
+def main():
+    """Local / worker mode — long polling. Needs TELEGRAM_BOT_TOKEN."""
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        print("Set TELEGRAM_BOT_TOKEN (from @BotFather) and re-run.")
+        return
+    app = build_application(token)
     print("Kavach Fraud Shield bot running…  (Ctrl+C to stop)")
     app.run_polling()
 
