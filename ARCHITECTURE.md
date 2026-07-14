@@ -17,7 +17,7 @@ design decisions behind them.
 | **Deterministic core, optional AI** | Pure-Python rule engines always run (no key needed); Google Gemini is layered *on top* and degrades gracefully. |
 | **Reliable demo** | No hard external dependency at request time; news + AI have graceful fallbacks; backend wake-gate handles cold starts. |
 | **Measurable** | Detectors evaluated on labelled hold-out sets; precision/recall/FP/FN exposed via `/api/metrics`. |
-| **Citizen-first** | Bilingual UI (EN/हिन्दी), 6-language advisories, multilingual detection (English/Hinglish/Hindi). |
+| **Citizen-first** | Bilingual UI (EN/हिन्दी), 12-language advisories, multi-channel (web · PWA · Telegram · IVR), multilingual detection (English/Hinglish/Hindi). |
 | **Stateless services** | No database; engines are pure functions over request input + bundled datasets → trivially horizontally scalable. |
 
 ---
@@ -190,7 +190,9 @@ flowchart LR
 | `voice_engine.py` | Voice-spoof / deepfake | numpy audio forensics; generates labelled demo clips (WAV) |
 | `orchestrator.py` | Agentic fusion chain | Triage → gate → correlate → geo → respond; fused threat score |
 | `metrics.py` | Measured evaluation | Confusion matrix + precision/recall/F1/FP/FN on labelled sets |
-| `advisory.py` | Citizen advisories | 6-language verdict messages + sample scenarios |
+| `advisory.py` | Citizen advisories | 12-language verdict messages + sample scenarios |
+| `counterfeit.py` | FICN identification agent | 4 CV analyses (microprint · thread · serial · UV-sim) + checklist, all 7 denominations |
+| `ivr.py` | Fraud Shield IVR channel | Twilio-compatible TwiML voice webhook (multi-language) |
 | `geo_stats.py` | Geodata + dashboard metrics | Hotspots, scam mix, weekly detections |
 | `news.py` | ET news feed | RSS fetch → keyword filter → cache → curated fallback |
 | `llm.py` | Gemini augmentation | Optional; multi-key **rotation** on quota/rate errors; `available=False` when no key |
@@ -319,7 +321,7 @@ variable sets. One toggle recolours the whole app (including graph/map/charts) w
 ### 6.2 Internationalisation
 `i18n.js` exposes `t(en, hi)` reading a module-level language + `useLang()` to re-render on change.
 Static UI is translated inline; finite backend labels (feature names, scam types, agent names) are mapped
-on the frontend; citizen advisories are localized in the backend (`advisory.py`) across 6 languages.
+on the frontend; citizen advisories are localized in the backend (`advisory.py`) across 12 languages.
 
 ### 6.3 Resilience
 - **BackendGate** polls `/api/health`, shows a cycling wake screen during Render cold start, gives up after ~90s.
@@ -364,7 +366,7 @@ economictime/
 │   │   ├── voice_engine.py    # numpy audio forensics + demo-clip generation
 │   │   ├── orchestrator.py    # agentic fusion chain
 │   │   ├── metrics.py         # labelled eval → precision/recall/FP/FN
-│   │   ├── advisory.py        # 6-language advisories + sample scenarios
+│   │   ├── advisory.py        # 12-language advisories + sample scenarios
 │   │   ├── geo_stats.py       # hotspots + dashboard metrics
 │   │   ├── news.py            # ET RSS fetch + filter + cache + fallback
 │   │   └── llm.py             # optional Gemini augmentation

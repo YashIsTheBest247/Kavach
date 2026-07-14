@@ -5,7 +5,7 @@
 Kavach AI shifts law enforcement, banks and citizens from **reactive case investigation**
 to **predictive threat neutralisation** — detecting digital-arrest scams *before money moves*,
 mapping fraud networks into court-auditable intelligence packages, screening counterfeit
-currency at the point of contact, and shielding citizens in 6 Indian languages.
+currency at the point of contact, and shielding citizens in 12 Indian languages.
 
 Built with **React + FastAPI**. The detection engine works on **English, Hinglish and Hindi**
 input, the entire UI is **bilingual (English / हिन्दी)** with a live toggle, ships **light & dark
@@ -37,8 +37,8 @@ Most tools stop at *detect*. Kavach also **disrupts** the scammer (harvests thei
 | **Link / QR Phishing Scanner** | Explains the tell-tale signs of a malicious link (IP host, punycode, brand typosquat, credential-bait, shorteners) with weighted factors. | *Phishing / malicious-link detection* |
 | **Number / UPI Reputation** | Crowdsourced fraud reports → a live reputation score anyone can look up before trusting a contact; a live community feed. | *Community fraud intelligence* |
 | **Fraud Network Graph** | Clusters victims, mules, spoofed numbers & devices into rings; emits **intelligence packages** and shared-infrastructure links. | *Fraud Network Graph Intelligence* |
-| **Counterfeit Currency Screen** | Image-forensics + security-feature checklist → calibrated FICN risk with contributing factors. | *Counterfeit Currency Identification Agent* |
-| **Citizen Fraud Shield** | Multi-channel, **6-language** assistant giving instant verdicts + guided 1930 reporting. | *Citizen Fraud Shield (Multi-channel)* |
+| **Counterfeit Currency Agent** | Four explainable CV analyses — **microprint**, **security-thread**, **serial-number (RBI format)** and **UV-feature simulation** — + operator checklist → calibrated FICN risk. **All 7 denominations**, deployable on phone / counter / POS. | *Counterfeit Currency Identification Agent* |
+| **Citizen Fraud Shield** | **Multi-channel** (Web · Telegram · IVR voice call · installable mobile app) assistant giving instant verdicts + guided 1930/NCRP reporting in **12 Indian languages**. | *Citizen Fraud Shield (Multi-channel)* |
 | **Geospatial Crime Map** | Live hotspot map of fraud complaints & FICN seizures for patrol prioritisation. | *Geospatial Crime Pattern Intelligence* |
 | **Measured Metrics** | Detectors on **labelled hold-out sets** → precision/recall/F1 + safety-critical FP/FN, with confusion matrices. | *Evaluation Focus (precision/recall, very-low FP)* |
 
@@ -60,7 +60,8 @@ Most tools stop at *detect*. Kavach also **disrupts** the scammer (harvests thei
 | **Counterfeit / FICN** (n=30) | 90.0% | 100% | 80.0% | 88.9% | **0%** | 20% (crude fakes caught; high-quality fakes need UV/IR) |
 
 ### 🎨 Platform UX
-- **Bilingual UI** — English / हिन्दी toggle (in the navbar & every page header) switches all static UI live; citizen advisories render in **6 Indian languages**.
+- **Bilingual UI** — English / हिन्दी toggle (in the navbar & every page header) switches all static UI live; citizen advisories render in **12 Indian languages** (English, Hindi, Bengali, Tamil, Telugu, Kannada, Marathi, Gujarati, Malayalam, Punjabi, Odia, Urdu).
+- **Installable mobile app (PWA)** — an "Install app" prompt on mobile adds Kavach to the home screen (manifest + service worker).
 - **Light & dark themes** — CSS-variable-driven, live toggle, no flash; graph/map/charts adapt.
 - **Responsive** — mobile drawer sidebar, adaptive layouts, animated route transitions.
 - **Live ET ticker** — scrolling scam-news headlines across the top of the landing page.
@@ -99,8 +100,8 @@ Browser (React SPA, dark UI)
    ▼
 FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam classifier
            ├── fraud_graph.py     entity graph + connected-component ring clustering
-           ├── counterfeit.py     Pillow image forensics + feature checklist scoring
-           ├── advisory.py        6-language citizen advisories + sample scenarios
+           ├── counterfeit.py     microprint · thread · serial · UV-sim CV analyses (all 7 denoms)
+           ├── advisory.py        12-language citizen advisories + sample scenarios
            ├── geo_stats.py       hotspot geodata + dashboard metrics
            ├── voice_engine.py    audio forensics + labelled demo-clip generation (numpy)
            ├── metrics.py         labelled eval sets → precision/recall/FP/FN
@@ -119,7 +120,8 @@ FastAPI  ──┬── scam_engine.py     rule-weighted, explainable scam clas
            ├── video_agent.py     awareness-reel agent (rank→script→TTS→render→publish)
            ├── security.py        two API-key surfaces (partner / automation)
            ├── usage.py           per-key rate limiting + usage dashboard
-           └── telegram_bot.py    full Telegram front-end to every engine (separate process)
+           ├── telegram_bot.py    full Telegram front-end to every engine (webhook / polling)
+           └── ivr.py             Fraud Shield IVR — Twilio-compatible voice webhook (TwiML)
 ```
 
 - **Frontend:** React 18, React Router, Tailwind (CSS-variable theming), Recharts (dashboard),
@@ -172,15 +174,20 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 | **POST** | **`/api/complaint/draft`** · **`/api/complaint/pdf`** | **one-tap NCRP complaint (JSON draft · ready-to-file PDF)** |
 | **GET** | **`/api/outbreak/alerts`** | **scam-outbreak early-warning: spiking scam types + threat level** |
 | GET | `/api/usage` | live per-key API usage + rate-limit utilisation |
+| GET | `/api/channels` | Fraud Shield channel status (web · telegram · ivr) + 12 languages |
+| GET | `/api/scam/languages` | the 12 supported advisory languages |
+| POST | `/api/whatsapp/twilio` | WhatsApp auto-check (free Twilio Sandbox → TwiML reply) |
+| POST | `/api/ivr/welcome` · `/api/ivr/analyze` | IVR voice webhook (Twilio-compatible TwiML) |
 | POST | `/api/automation/*` · `/api/partner/*` | key-protected reel-agent & embeddable-detection surfaces |
 
 > **Telegram:** run `python -m app.telegram_bot` (set `TELEGRAM_BOT_TOKEN`) to expose every engine in chat.
+> **IVR:** point a Twilio/Exotel number's voice webhook at `/api/ivr/welcome`.
 
 
 ---
 
 ## Scope 
-- **Counterfeit screening** is an explainable MVP (phone-photo forensics + security-feature checklist), **not** a UV/IR-hardware + trained-CNN system — clearly disclaimed in-app; high-quality fakes are the measured 20% false-negatives.
+- **Counterfeit screening** runs four explainable CV analyses (microprint, security-thread, RBI serial-format, UV-simulation) + an operator checklist across all 7 denominations — but it is **not** a UV/IR-hardware + trained-CNN system (UV is *simulated* from the photo); clearly disclaimed in-app, and high-quality fakes are the measured ~20% false-negatives.
 - **Voice-spoof** is heuristic audio forensics, not an ASVspoof-grade model; it ships labelled demo clips so the metric is real and reproducible.
 - **Fraud-graph & geo data** are realistic **synthetic** datasets modelled on NCRP/RBI reporting patterns — swap in live UPI/CDR/NCRP feeds in production.
 - **News** is live ET RSS, keyword-filtered; when ET has no fresh consumer-scam stories (or is unreachable) it shows curated fallback headlines, flagged in the UI.
@@ -189,6 +196,7 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 - **Video-Call Shield** is frame-level forensics (a triage signal for the video-call vector), not a trained video-deepfake CNN — it pairs the score with the decisive caller-verification advice.
 - **One-Tap Complaint** generates a fully-drafted, NCRP-ready complaint + PDF for the citizen to submit; it does **not** auto-file into government systems (no public write API).
 - **Outbreak Early-Warning** is indicative trend-detection from live news + crowd reports, not an official government advisory.
+- **Fraud Shield channels**: Web, installable PWA and Telegram are live; **WhatsApp** (free Twilio Sandbox — auto-checks any inbound message, reply auto-localized to the sender's script) and **IVR** voice are Twilio-compatible TwiML webhooks that activate when a Twilio number/sandbox is pointed at them — no backend keys or Meta business verification needed. All 12 languages localize the *verdict advisory*; the chat greeting/sample chips are localized too.
 
 Helpline **1930** · **cybercrime.gov.in**
 

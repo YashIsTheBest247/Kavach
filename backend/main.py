@@ -23,7 +23,8 @@ import time
 from app import (scam_engine, fraud_graph, counterfeit, geo_stats, advisory, llm,
                  voice_engine, metrics, orchestrator, news, video_agent, security,
                  link_scanner, reports, ai_image, report_pdf, usage,
-                 honeypot, deepfake_video, complaint, outbreak, telegram_bot)
+                 honeypot, deepfake_video, complaint, outbreak, telegram_bot, ivr,
+                 whatsapp_bot)
 
 app = FastAPI(
     title="Kavach AI — Digital Public Safety Intelligence",
@@ -115,7 +116,52 @@ def scam_samples():
 
 @app.get("/api/scam/languages")
 def scam_languages():
-    return {"languages": advisory.LANGUAGES}
+    return {"languages": advisory.LANGUAGES, "detail": advisory.languages()}
+
+
+# ============================================================================
+# Citizen Fraud Shield — multi-channel access (WhatsApp · IVR · web/mobile app)
+# ============================================================================
+@app.get("/api/channels")
+def channels_status():
+    # 'live'  = actually reachable by a citizen right now.
+    # 'ready' = engine + webhook built and tested, awaiting a provider connection.
+    wa_code = os.getenv("WHATSAPP_SANDBOX_CODE")
+    ivr_num = os.getenv("IVR_NUMBER")
+    tg = bool(os.getenv("TELEGRAM_BOT_TOKEN"))
+    return {
+        "web": {"status": "live", "note": "React SPA + installable PWA (mobile app)"},
+        "telegram": {"status": "live" if tg else "ready", "handle": "@Kavach_support_bot"},
+        "whatsapp": {"status": "live" if wa_code else "ready",
+                     "note": "Free Twilio WhatsApp Sandbox — auto-checks any message",
+                     "number": os.getenv("WHATSAPP_SANDBOX_NUMBER", "+1 415 523 8886"),
+                     "join_code": wa_code or None},
+        "ivr": {"status": "live" if ivr_num else "ready",
+                "note": "TwiML voice webhook — connect a Twilio/Exotel number",
+                "number": ivr_num or None},
+        "languages": advisory.languages(),
+    }
+
+
+# ---- WhatsApp (free Twilio Sandbox — auto-check any inbound message) ----
+@app.post("/api/whatsapp/twilio")
+async def whatsapp_twilio(request: Request):
+    form = await request.form()
+    body = form.get("Body", "") or ""
+    return Response(content=whatsapp_bot.twiml(body), media_type="application/xml")
+
+
+# ---- IVR (Twilio-compatible voice) ----
+@app.post("/api/ivr/welcome")
+def ivr_welcome(lang: str = "en"):
+    return Response(content=ivr.welcome_twiml(lang), media_type="application/xml")
+
+
+@app.post("/api/ivr/analyze")
+async def ivr_analyze(request: Request, lang: str = "en"):
+    form = await request.form()
+    speech = form.get("SpeechResult") or form.get("speech") or ""
+    return Response(content=ivr.analyze_twiml(speech, lang), media_type="application/xml")
 
 
 # ---------- fraud network graph ----------
@@ -139,11 +185,12 @@ def counterfeit_features():
 async def counterfeit_screen(
     denomination: str = Form("500"),
     confirmed_features: str = Form(""),  # comma-separated keys
+    serial: str = Form(""),              # optional note serial number
     file: UploadFile = File(...),
 ):
     img_bytes = await file.read()
     feats: List[str] = [f for f in confirmed_features.split(",") if f]
-    return counterfeit.screen_note(img_bytes, denomination, feats)
+    return counterfeit.screen_note(img_bytes, denomination, feats, serial=serial)
 
 
 # ---------- agentic fusion orchestrator ----------
@@ -376,9 +423,10 @@ async def partner_voice(file: UploadFile = File(...)):
 @app.post("/api/partner/counterfeit/screen", dependencies=[Depends(security.require_partner_key)])
 async def partner_counterfeit(denomination: str = Form("500"),
                               confirmed_features: str = Form(""),
+                              serial: str = Form(""),
                               file: UploadFile = File(...)):
     feats = [f for f in confirmed_features.split(",") if f]
-    return counterfeit.screen_note(await file.read(), denomination, feats)
+    return counterfeit.screen_note(await file.read(), denomination, feats, serial=serial)
 
 
 @app.get("/api/partner/health", dependencies=[Depends(security.require_partner_key)])

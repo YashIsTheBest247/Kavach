@@ -20,6 +20,7 @@ export const analyzeScam = (text, channel, language, useAi = false) =>
 export const getLlmStatus = () => api.get('/llm/status').then((r) => r.data)
 
 export const getScamSamples = () => api.get('/scam/samples').then((r) => r.data)
+export const getChannels = () => api.get('/channels').then((r) => r.data)
 export const getHealth = () => api.get('/health', { timeout: 12000 }).then((r) => r.data)
 export const getStats = () => api.get('/stats').then((r) => r.data)
 export const getNews = () => api.get('/news').then((r) => r.data)
@@ -27,11 +28,12 @@ export const getFraudGraph = () => api.get('/fraud/graph').then((r) => r.data)
 export const getFraudPackages = () => api.get('/fraud/packages').then((r) => r.data)
 export const getCounterfeitFeatures = () =>
   api.get('/counterfeit/features').then((r) => r.data)
-export const screenNote = (file, denomination, confirmedFeatures) => {
+export const screenNote = (file, denomination, confirmedFeatures, serial = '') => {
   const fd = new FormData()
   fd.append('file', file)
   fd.append('denomination', denomination)
   fd.append('confirmed_features', confirmedFeatures.join(','))
+  fd.append('serial', serial)
   return api.post('/counterfeit/screen', fd).then((r) => r.data)
 }
 export const getHotspots = () => api.get('/geo/hotspots').then((r) => r.data)

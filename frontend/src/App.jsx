@@ -21,9 +21,11 @@ import VideoShield from './pages/VideoShield.jsx'
 import ComplaintFile from './pages/ComplaintFile.jsx'
 import OutbreakAlerts from './pages/OutbreakAlerts.jsx'
 import ApiDocs from './pages/ApiDocs.jsx'
+import InstallButton from './components/InstallButton.jsx'
 
 export default function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/console" element={<BackendGate><ConsoleLayout /></BackendGate>}>
@@ -48,5 +50,7 @@ export default function App() {
         <Route path="api" element={<ApiDocs />} />
       </Route>
     </Routes>
+    <InstallButton />
+    </>
   )
 }

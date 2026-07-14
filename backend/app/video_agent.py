@@ -368,7 +368,12 @@ def assemble_video(image_paths: List[str], audio_path: str, segments: List[Dict]
                 pass   # subtitles best-effort; images + audio still render
 
         video = CompositeVideoClip(overlays, size=(W, H)).with_audio(audio)
-        video.write_videofile(out_mp4, fps=24, codec="libx264", audio_codec="aac", logger=None)
+        # This is a STATIC-image slideshow (no motion), so frame generation — not
+        # x264 — dominates. 12 fps looks identical for static content and halves the
+        # frames; 'ultrafast' + all cores handle the rest. ~3x faster, same look.
+        video.write_videofile(out_mp4, fps=12, codec="libx264", audio_codec="aac",
+                              preset="ultrafast", threads=os.cpu_count() or 4,
+                              ffmpeg_params=["-crf", "28"], logger=None)
         return {"available": True, "path": out_mp4}
     except Exception as e:
         return {"available": False, "reason": f"Renderer error: {e}"}

@@ -1,0 +1,16 @@
+{
+  "name": "Kavach AI — Digital Public Safety",
+  "short_name": "Kavach AI",
+  "description": "Detect scams, deepfakes, phishing and counterfeit notes — and report them — in your language.",
+  "start_url": "/console",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0c",
+  "theme_color": "#0a0a0c",
+  "categories": ["utilities", "security", "government"],
+  "icons": [
+    { "src": "/shield.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/shield.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

@@ -8,8 +8,9 @@ import { Gavel } from 'lucide-react'
 import { useLang, t } from '../i18n.js'
 
 const LANGS = [
-  ['en', 'English'], ['hi', 'हिन्दी'], ['ta', 'தமிழ்'],
-  ['kn', 'ಕನ್ನಡ'], ['te', 'తెలుగు'], ['bn', 'বাংলা'],
+  ['en', 'English'], ['hi', 'हिन्दी'], ['bn', 'বাংলা'], ['ta', 'தமிழ்'],
+  ['te', 'తెలుగు'], ['kn', 'ಕನ್ನಡ'], ['mr', 'मराठी'], ['gu', 'ગુજરાતી'],
+  ['ml', 'മലയാളം'], ['pa', 'ਪੰਜਾਬੀ'], ['or', 'ଓଡ଼ିଆ'], ['ur', 'اردو'],
 ]
 const CHANNELS = ['Phone Call', 'Video Call', 'WhatsApp', 'SMS', 'Email']
 

@@ -1,11 +1,17 @@
 import { useEffect, useState, useRef } from 'react'
-import { Upload, ScanLine, CheckCircle2, XCircle, Info } from 'lucide-react'
+import { Upload, ScanLine, CheckCircle2, XCircle, Info, Microscope, AlignVerticalJustifyCenter, Hash, Sparkles, ArrowUp, ArrowDown } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
 import { getCounterfeitFeatures, screenNote } from '../api.js'
 import { useLang, t } from '../i18n.js'
 
-const DENOMS = ['100', '200', '500', '2000']
+const DENOMS = ['10', '20', '50', '100', '200', '500', '2000']
+const ANALYSIS_ICON = {
+  'Microprint analysis': Microscope,
+  'Security-thread verification': AlignVerticalJustifyCenter,
+  'UV-feature simulation': Sparkles,
+  'Serial-number validation': Hash,
+}
 
 const FEATURE_HI = {
   security_thread: "विंडोड सुरक्षा धागा 'भारत' / 'RBI' दिखाता है और रंग हरा→नीला बदलता है",
@@ -20,6 +26,7 @@ export default function Counterfeit() {
   const [features, setFeatures] = useState([])
   const [denom, setDenom] = useState('500')
   const [confirmed, setConfirmed] = useState([])
+  const [serial, setSerial] = useState('')
   const [file, setFile] = useState(null)
   const [preview, setPreview] = useState(null)
   const [res, setRes] = useState(null)
@@ -52,26 +59,33 @@ export default function Counterfeit() {
   const run = async () => {
     if (!file) { setErr('Upload a note image first'); return }
     setErr(null); setLoading(true)
-    try { setRes(await screenNote(file, denom, confirmed)) }
+    try { setRes(await screenNote(file, denom, confirmed, serial)) }
     catch { setErr('Backend not reachable on :8000') }
     finally { setLoading(false) }
   }
 
   return (
     <>
-      <PageHeader title={t('Counterfeit Currency', 'नकली मुद्रा')} accent={t('Screening', 'स्क्रीनिंग')}
-        subtitle={t('Explainable image-forensics + security-feature checklist for FICN screening at point of contact', 'संपर्क बिंदु पर नकली नोट जाँच हेतु व्याख्यायोग्य इमेज-फोरेंसिक + सुरक्षा-फ़ीचर चेकलिस्ट')} />
+      <PageHeader title={t('Counterfeit Currency', 'नकली मुद्रा')} accent={t('Identification Agent', 'पहचान एजेंट')}
+        subtitle={t('Microprint · security-thread · serial-number · UV-simulation analyses + operator checklist — all 7 denominations, deployable on phone / counter / POS', 'माइक्रोप्रिंट · सुरक्षा-धागा · सीरियल-नंबर · UV-सिमुलेशन विश्लेषण + ऑपरेटर चेकलिस्ट — सभी 7 मूल्यवर्ग, फ़ोन / काउंटर / POS पर')} />
       <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
             <label className="text-sm font-600 text-gray-300">{t('Denomination', 'मूल्यवर्ग')}</label>
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {DENOMS.map((d) => (
                 <button key={d} onClick={() => setDenom(d)}
-                  className={`px-4 py-2 rounded-lg text-sm font-600 border transition-colors ${denom === d ? 'bg-brand text-black border-brand' : 'bg-ink-900 text-gray-300 border-white/10 hover:border-brand/40'}`}>
+                  className={`px-3.5 py-2 rounded-lg text-sm font-600 border transition-colors ${denom === d ? 'bg-brand text-black border-brand' : 'bg-ink-900 text-gray-300 border-white/10 hover:border-brand/40'}`}>
                   ₹{d}
                 </button>
               ))}
+            </div>
+
+            <div className="mt-4">
+              <label className="text-xs text-gray-500 flex items-center gap-1 mb-1"><Hash size={12} /> {t('Serial number (optional — validated against RBI panel format)', 'सीरियल नंबर (वैकल्पिक — RBI पैनल फ़ॉर्मेट से सत्यापित)')}</label>
+              <input value={serial} onChange={(e) => setSerial(e.target.value)}
+                placeholder="e.g. 5AB 123456"
+                className="w-full bg-ink-900 border border-ink-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand font-mono uppercase" />
             </div>
 
             <label className="mt-5 block">
@@ -129,6 +143,34 @@ export default function Counterfeit() {
                     style={{ width: `${res.counterfeit_risk_score}%` }} />
                 </div>
               </div>
+
+              {res.analyses?.length > 0 && (
+                <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
+                  <h3 className="font-display font-600 text-white mb-3 flex items-center gap-2">
+                    <Microscope size={18} className="text-brand" /> {t('Computer-vision analyses', 'कंप्यूटर-विज़न विश्लेषण')}
+                  </h3>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {res.analyses.map((a, i) => {
+                      const Icon = ANALYSIS_ICON[a.name] || Info
+                      const raises = a.direction === 'raises'
+                      const neutral = a.direction === 'neutral' || a.valid === null
+                      return (
+                        <div key={i} className={`rounded-lg border p-3 ${neutral ? 'border-white/8 bg-ink-900' : raises ? 'border-red-500/25 bg-red-500/5' : 'border-emerald-500/20 bg-emerald-500/5'}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-sm font-600 text-gray-200 flex items-center gap-1.5"><Icon size={14} className="text-brand" /> {a.name}</span>
+                            {!neutral && (
+                              <span className={`text-[10px] font-700 flex items-center gap-0.5 ${raises ? 'text-red-300' : 'text-emerald-300'}`}>
+                                {raises ? <ArrowUp size={11} /> : <ArrowDown size={11} />}{a.impact}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1.5 leading-snug">{a.detail}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
                 <h3 className="font-display font-600 text-white mb-3">{t('Contributing factors', 'योगदान कारक')}</h3>
