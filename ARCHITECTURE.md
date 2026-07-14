@@ -34,68 +34,129 @@ flowchart TD
 
     subgraph Presentation["Presentation Layer · React SPA (Vercel)"]
         L[Landing + ET ticker]
-        C[Command Console · 10 tools]
-        T[Theme + i18n stores]
-        G[BackendGate / wake screen]
+        C[Command Console · 20+ tools]
+        TGc[Telegram chat entry]
     end
 
     subgraph API["Gateway & Application Layer · FastAPI (Render)"]
         R[REST /api/*]
-        V[Pydantic validation]
-        X[CORS allow-list]
+        WH[Telegram webhook]
+        SEC[2 API-key surfaces + rate limit]
+        IMG[Image proxy / media]
     end
 
-    subgraph Engines["Core Processing · Python engines (deterministic + explainable)"]
+    subgraph Detect["DETECT · threat classifiers"]
         SE[scam_engine]
-        FG[fraud_graph]
-        CF[counterfeit]
         VE[voice_engine]
-        OR[orchestrator]
-        ME[metrics]
-        AD[advisory]
-        GS[geo_stats]
-        NW[news]
+        AII[ai_image]
+        DV[deepfake_video]
+        LK[link_scanner]
+        CF[counterfeit]
     end
 
-    subgraph External["Intelligence & External Layer"]
-        GEM[Google Gemini · optional]
+    subgraph Disrupt["DISRUPT · offence"]
+        HP[honeypot]
+        FG[fraud_graph]
+        RP[reports / reputation]
+    end
+
+    subgraph Act["ACT · response"]
+        OR[orchestrator]
+        CM[complaint]
+        PDF[report_pdf]
+    end
+
+    subgraph Prevent["PREVENT & REACH"]
+        OB[outbreak]
+        GS[geo_stats]
+        VA[video_agent · reels]
+        ME[metrics]
+        NW[news]
+        AD[advisory]
+    end
+
+    subgraph External["AI + Data Layer"]
+        GEM[Google Gemini · key rotation]
         ETR[Economic Times RSS]
+        PX[Pexels / Openverse]
+        DB[(Crowd fraud DB)]
+        TB[Telegram Bot API]
     end
 
     Users --> Presentation
-    Presentation -->|HTTPS /api| API
-    API --> Engines
-    OR -. orchestrates .-> SE & FG & GS & AD
+    Presentation -->|HTTPS · VITE_API_URL| API
+    API --> Detect
+    API --> Disrupt
+    API --> Act
+    API --> Prevent
+    OR -. fuses .-> SE
+    OR -. fuses .-> FG
+    OR -. fuses .-> GS
+    OR -. fuses .-> AD
     SE -. optional .-> GEM
-    OR -. optional .-> GEM
+    CM -. optional .-> GEM
+    HP -. optional .-> GEM
+    HP --> DB
+    RP --> DB
+    OB --> DB
+    OB --> NW
     NW --> ETR
+    VA --> PX
+    WH <--> TB
+```
+
+### The Kavach loop · Detect → Disrupt → Act
+
+```mermaid
+flowchart LR
+    IN([Suspicious call / message / link / image / note / video]) --> D
+
+    subgraph D["1 · DETECT"]
+        D1[Explainable verdict + evidence trail]
+        D2[Gemini reasoning layer]
+    end
+    subgraph DIS["2 · DISRUPT"]
+        DS1[Honeypot baits the scammer]
+        DS2[Harvest UPI / phone / a-c / links]
+    end
+    subgraph A["3 · ACT"]
+        A1[One-tap NCRP complaint + PDF]
+        A2[MHA / telecom drafts · outbreak alert]
+    end
+
+    D --> DIS --> A
+    A -. harvested intel + reports .-> DB[(Crowd fraud DB)]
+    DIS -. auto-file .-> DB
+    DB -. sharpens next detection .-> D
 ```
 
 ### Layered view (as in the deck)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ PRESENTATION LAYER · React SPA + Tailwind (Vercel)                       │
-│   English/हिन्दी · Scam Alerts · Command Dashboard · Fraud Shield · News   │
+│ PRESENTATION LAYER · React SPA + Tailwind (Vercel)                        │
+│   English/हिन्दी · 20+ tools · Command Dashboard · Telegram chat entry      │
 └───────────────┬───────────────────────────────────┬──────────────────────┘
-                │ HTTP / REST                        │ (axios)
+                │ HTTP / REST (axios)                │ Telegram webhook
 ┌───────────────▼───────────────────────────────────▼──────────────────────┐
 │ GATEWAY & APPLICATION LAYER · FastAPI (Render)                            │
-│   API Endpoints · Request Validation (Pydantic) · CORS · Health gate      │
+│   REST /api/* · Pydantic · CORS · 2 API-key surfaces + rate limit ·       │
+│   Telegram webhook · image proxy / media                                  │
 └───────────────┬──────────────────────────────────────────────────────────┘
                 │
 ┌───────────────▼──────────────────────────────────────────────────────────┐
 │ CORE PROCESSING LAYER · Python (deterministic + explainable)              │
-│  Scam Detection · Image & Audio Forensics · Fraud Network Graph ·         │
-│  Citizen Advisory · Geospatial Map                                        │
-│  ── AGENTIC THREAT FUSION ORCHESTRATOR ──                                  │
-│     Triage → Escalation → Network Correlation → Geo-Context → Response     │
+│  DETECT   scam · voice · deepfake-image · video-call · link/QR · note     │
+│  DISRUPT  counter-intel honeypot · fraud graph · number/UPI reputation    │
+│  ACT      one-tap NCRP complaint · court PDF · fusion orchestrator         │
+│  PREVENT  outbreak early-warning · crime map · awareness reels · metrics   │
+│  ── AGENTIC FUSION: Triage → Escalate → Correlate → Geo → Response ──      │
 └───────────────┬──────────────────────────────────────────────────────────┘
                 │
 ┌───────────────▼──────────────────────────────────────────────────────────┐
-│ INTELLIGENCE & EXTERNAL LAYER                                              │
-│   Google Gemini (optional / fallback) · Economic Times RSS ·              │
-│   Synthetic datasets + labelled hold-out sets · Evaluation pipeline       │
+│ AI + DATA LAYER                                                           │
+│   Google Gemini (multi-key rotation, optional) · Economic Times RSS ·     │
+│   Pexels / Openverse · crowd fraud DB · labelled eval sets · Telegram API │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
