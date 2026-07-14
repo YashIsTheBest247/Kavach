@@ -35,22 +35,22 @@ export default function VoiceSpoof() {
 
   return (
     <>
-      <PageHeader title={t('Voice-Spoof', 'वॉइस-स्पूफ़')} accent={t('& Deepfake Detection', 'और डीपफेक डिटेक्शन')}
-        subtitle={t('Explainable audio forensics that flags synthetic / AI-cloned voices used in scam calls', 'व्याख्यायोग्य ऑडियो फोरेंसिक जो घोटाला कॉल में इस्तेमाल सिंथेटिक / AI-क्लोन आवाज़ों को पकड़ता है')} />
+      <PageHeader title={t('Voice-Spoof', 'वॉइस-स्पूफ़')} accent={t('Audio-Forensics Triage', 'ऑडियो-फोरेंसिक ट्रायेज')}
+        subtitle={t('Explainable audio-forensics that flags machine / robocall-style call audio — a triage signal that pairs with the scam-script detector', 'व्याख्यायोग्य ऑडियो-फोरेंसिक जो मशीन / रोबोकॉल-शैली कॉल ऑडियो को चिह्नित करता है — घोटाला-स्क्रिप्ट डिटेक्टर के साथ काम करने वाला ट्रायेज संकेत')} />
       <div className="p-4 md:p-8 grid lg:grid-cols-2 gap-6">
         {/* input */}
         <div className="space-y-4">
           <div className="rounded-xl border border-white/8 bg-ink-700 p-5">
             <div className="text-sm font-600 text-gray-300 mb-1 flex items-center gap-2">
-              <Waves size={16} className="text-brand" /> {t('Try a labelled demo clip', 'एक लेबल किया डेमो क्लिप आज़माएँ')}
+              <Waves size={16} className="text-brand" /> {t('Try a sample clip', 'एक नमूना क्लिप आज़माएँ')}
             </div>
             <p className="text-xs text-gray-500 mb-3">
-              {t('Generates a clip with known ground truth, plays it, and screens it — no audio file needed.', 'ज्ञात ग्राउंड ट्रुथ वाली क्लिप बनाता है, चलाता है और जाँचता है — कोई ऑडियो फ़ाइल नहीं चाहिए।')}
+              {t('Plays a clip, then scores its acoustic signature — a real human recording, or a machine-generated signal.', 'एक क्लिप चलाता है, फिर उसकी ध्वनिक विशेषता स्कोर करता है — असली मानव रिकॉर्डिंग, या मशीन-जनित संकेत।')}
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button onClick={() => runDemo('synthetic')} disabled={loading}
                 className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-ink-900 text-gray-300 py-3 hover:border-brand/50 hover:text-white transition-colors disabled:opacity-60">
-                {t('Synthetic / AI voice', 'सिंथेटिक / AI आवाज़')}
+                {t('Synthetic signal', 'सिंथेटिक संकेत')}
               </button>
               <button onClick={() => runDemo('human')} disabled={loading}
                 className="flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-ink-900 text-gray-300 py-3 hover:border-brand/50 hover:text-white transition-colors disabled:opacity-60">
@@ -80,7 +80,7 @@ export default function VoiceSpoof() {
 
           <div className="rounded-lg bg-ink-800 border border-white/8 p-3 text-xs text-gray-500 flex gap-2">
             <Info size={14} className="shrink-0 mt-0.5" />
-            {t('Heuristic MVP — pairs with the scam-script detector to catch AI-voice digital-arrest calls. Measured accuracy on the Metrics page.', 'ह्यूरिस्टिक MVP — AI-आवाज़ डिजिटल-अरेस्ट कॉल पकड़ने हेतु घोटाला-स्क्रिप्ट डिटेक्टर के साथ काम करता है। मापी गई सटीकता मेट्रिक्स पेज पर।')}
+            {t('Explainable audio-forensics triage — flags machine / robocall-style signal characteristics and pairs with the scam-script detector for AI-voice digital-arrest calls.', 'व्याख्यायोग्य ऑडियो-फोरेंसिक ट्रायेज (प्रशिक्षित डीपफेक CNN नहीं) — मशीन / रोबोकॉल-शैली संकेत विशेषताएँ चिह्नित करता है और AI-आवाज़ डिजिटल-अरेस्ट कॉल हेतु घोटाला-स्क्रिप्ट डिटेक्टर के साथ काम करता है।')}
           </div>
         </div>
 
@@ -103,9 +103,9 @@ export default function VoiceSpoof() {
                   <div className={`h-full ${res.synthetic_risk_score >= 60 ? 'bg-red-500' : res.synthetic_risk_score >= 35 ? 'bg-yellow-500' : 'bg-emerald-500'}`}
                     style={{ width: `${res.synthetic_risk_score}%` }} />
                 </div>
-                {res.demo_kind && (
+                {res.clip && (
                   <div className="mt-3 text-xs text-gray-500">
-                    {t('Ground truth for this demo clip:', 'इस डेमो क्लिप के लिए ग्राउंड ट्रुथ:')} <span className="text-gray-300 font-600">{res.demo_kind === 'synthetic' ? t('Synthetic / AI', 'सिंथेटिक / AI') : t('Human', 'मानव')}</span>
+                    {t('Sample:', 'नमूना:')} <span className="text-gray-300 font-600">{res.clip}</span>
                   </div>
                 )}
               </div>

@@ -9,6 +9,7 @@ system.
 """
 from __future__ import annotations
 
+import re
 import time
 from typing import Dict, List
 
@@ -16,21 +17,30 @@ from app import news, reports
 
 # Scam families and the tokens that identify them in news headlines / reports.
 FAMILIES = [
-    ("Digital Arrest", ["digital arrest", "cbi", "ed officer", "custom", "parcel", "police call", "arrest warrant"]),
-    ("UPI / Banking Fraud", ["upi", "netbanking", "bank fraud", "money transfer", "account", "debit", "credit card"]),
-    ("KYC / Phishing", ["kyc", "phishing", "verify", "sim", "otp", "fake link", "update account"]),
-    ("Investment / Task Scam", ["investment", "trading", "task scam", "part time job", "crypto", "stock tip", "telegram job"]),
-    ("Loan App Harassment", ["loan app", "instant loan", "recovery", "blackmail", "harass"]),
+    ("Digital Arrest", ["digital arrest", "cbi", "ed officer", "customs", "parcel scam", "fake police", "arrest warrant", "impersonation"]),
+    ("UPI / Banking Fraud", ["upi fraud", "upi scam", "netbanking", "bank fraud", "money mule", "mule account", "unauthorised transaction"]),
+    ("KYC / Phishing", ["kyc", "phishing", "otp scam", "otp share", "fake link", "sim swap", "credential"]),
+    ("Investment / Task Scam", ["investment scam", "trading scam", "task scam", "part-time job scam", "crypto scam", "stock tip", "ponzi"]),
+    ("Loan App Harassment", ["loan app", "instant loan", "loan scam", "recovery agent", "blackmail", "harassment"]),
     ("Counterfeit Currency", ["counterfeit", "fake note", "ficn", "fake currency"]),
-    ("Deepfake / AI Voice", ["deepfake", "ai voice", "voice clone", "morphed", "face swap"]),
+    ("Deepfake / AI Voice", ["deepfake", "ai voice", "voice clone", "voice cloning", "morphed", "face swap"]),
 ]
 
 _RECENCY_WINDOW = 14 * 86400  # reports within 14 days weigh into "spiking"
+_TOK_RE = {}
 
 
 def _match(text: str, tokens: List[str]) -> bool:
+    """Word-boundary match so 'customs' never fires on 'customer' or 'loan app'
+    on 'loan application'."""
     t = (text or "").lower()
-    return any(tok in t for tok in tokens)
+    for tok in tokens:
+        rx = _TOK_RE.get(tok)
+        if rx is None:
+            rx = _TOK_RE[tok] = re.compile(r"\b" + re.escape(tok) + r"\b")
+        if rx.search(t):
+            return True
+    return False
 
 
 def alerts() -> Dict:
@@ -56,7 +66,10 @@ def alerts() -> Dict:
         else:
             severity, trend = "LOW", "watch"
 
-        sample = next((it.get("title") for it, tx in zip(feed, news_text) if _match(tx, tokens)), None)
+        # Prefer a headline whose TITLE actually matches (relevant to the family);
+        # only fall back to a title+summary match so we never show an off-topic story.
+        sample_item = (next((it for it in feed if _match(it.get("title", ""), tokens)), None)
+                       or next((it for it, tx in zip(feed, news_text) if _match(tx, tokens)), None))
         out.append({
             "scam_type": name,
             "severity": severity,
@@ -65,7 +78,8 @@ def alerts() -> Dict:
             "news_mentions": news_hits,
             "citizen_reports": len(rep_hits),
             "reports_last_14d": fresh,
-            "headline_sample": sample,
+            "headline_sample": sample_item.get("title") if sample_item else None,
+            "headline_link": sample_item.get("link") if sample_item else None,
             "advice": _advice(name),
         })
 

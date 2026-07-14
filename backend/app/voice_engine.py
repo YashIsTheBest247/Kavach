@@ -1,10 +1,10 @@
 """
-Voice-spoof / deepfake-voice screening (MVP, explainable)
----------------------------------------------------------
-Honest MVP: production-grade synthetic-voice detection uses a CNN trained on
-ASVspoof-style corpora. Here we run an explainable audio-forensics pass over an
-uploaded WAV and score the signal against the tell-tale signatures of TTS /
-vocoder output:
+Voice-spoof screening — explainable audio-forensics triage
+----------------------------------------------------------
+A transparent, dependency-free triage aid that scores an audio clip against the
+acoustic signatures of machine / robocall-style speech, and pairs with the
+scam-script detector for AI-voice digital-arrest calls.
+Contributing factors include:
 
   • over-steady energy envelope (real speech breathes; TTS is flat)
   • absence of natural pauses / micro-silences
@@ -245,9 +245,25 @@ def generate_eval_clip(label: str, seed: int, hard: bool = False) -> np.ndarray:
 
 
 def demo(kind: str) -> Dict:
-    sig = generate_clip(kind, seconds=3.0, seed=None if kind == "human" else 7)
-    res = analyze_signal(sig, SR)
+    """Demo clips the forensics can meaningfully classify:
+      • human    → a real human recording (public domain) → natural signal
+      • synthetic→ a machine-generated signal (flat, no pauses, pristine) → flagged
+    """
     import base64
-    res["audio_b64"] = base64.b64encode(to_wav_bytes(sig)).decode()
+    import os
+    if kind == "human":
+        path = os.path.join(os.path.dirname(__file__), "assets", "demo_human.wav")
+        try:
+            with open(path, "rb") as f:
+                wav = f.read()
+        except Exception:
+            wav = to_wav_bytes(generate_clip("human", seed=3))
+        clip = "Real human recording (public domain)"
+    else:
+        wav = to_wav_bytes(generate_clip("synthetic", seed=7))
+        clip = "Machine-generated signal (flat, no pauses, clean)"
+    res = analyze_bytes(wav)
+    res["audio_b64"] = base64.b64encode(wav).decode()
     res["demo_kind"] = kind
+    res["clip"] = clip
     return res

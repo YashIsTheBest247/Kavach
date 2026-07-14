@@ -29,3 +29,5 @@ backend/secrets/
 
 # Crowdsourced report store
 backend/data/
+backend/shots/
+backend/models/

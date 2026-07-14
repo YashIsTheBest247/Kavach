@@ -32,7 +32,7 @@ Most tools stop at *detect*. Kavach also **disrupts** the scammer (harvests thei
 |---|---|---|
 | **Agentic Threat Fusion** | An **orchestrator** chaining cooperating agents (Triage → escalation gate → Network-Correlation → Geo-Context → Response) so modules act as one brain: links the fraud ring, attaches geo context, computes a **fused threat score** and auto-drafts citizen + telecom + MHA-NCRP responses. Every step auditable. | *Agentic AI for multi-source intelligence fusion* |
 | **Digital Arrest Detector** | Real-time, explainable scam-script classifier with an **auditable evidence trail** (every flagged phrase + tactic + weight) → export a **court-admissible SHA-256 PDF** or file a complaint in one tap. | *Digital Arrest Scam Detection & Alerting* |
-| **Voice-Spoof Detection** | Explainable audio forensics flagging AI-cloned / synthetic voices; ships **labelled demo clips** so it's demoable without files. | *Speech AI (voice spoofing & AI-voice detection)* |
+| **Voice-Spoof Triage** | Explainable audio-forensics triage flagging machine / robocall-style call audio (signal characteristics); a triage aid that pairs with the scam-script detector | *Speech AI (voice-spoofing signal triage)* |
 | **Deepfake Image Detector** | Explainable image-forensics triage for fake profile photos / forged IDs (EXIF, high-freq detail, generator geometry, noise). | *Deepfake / synthetic-media detection* |
 | **Link / QR Phishing Scanner** | Explains the tell-tale signs of a malicious link (IP host, punycode, brand typosquat, credential-bait, shorteners) with weighted factors. | *Phishing / malicious-link detection* |
 | **Number / UPI Reputation** | Crowdsourced fraud reports → a live reputation score anyone can look up before trusting a contact; a live community feed. | *Community fraud intelligence* |
@@ -56,8 +56,9 @@ Most tools stop at *detect*. Kavach also **disrupts** the scammer (harvests thei
 | Detector | Accuracy | Precision | Recall | F1 | False-Positive | False-Negative |
 |---|---|---|---|---|---|---|
 | **Scam / Digital-Arrest** (n=36) | 91.7% | 100% | 83.3% | 90.9% | **0%** (no citizen false alarms) | 16.7% |
-| **Voice-Spoof / Deepfake** (n=40) | 90.0% | 83.3% | 100% | 90.9% | 20% | **0%** (no deepfake missed) |
 | **Counterfeit / FICN** (n=30) | 90.0% | 100% | 80.0% | 88.9% | **0%** | 20% (crude fakes caught; high-quality fakes need UV/IR) |
+
+*(Voice-spoof is an explainable audio-forensics triage aid, not a benchmarked deepfake model — intentionally excluded from the measured table to avoid overclaiming.)*
 
 ### 🎨 Platform UX
 - **Bilingual UI** — English / हिन्दी toggle (in the navbar & every page header) switches all static UI live; citizen advisories render in **12 Indian languages** (English, Hindi, Bengali, Tamil, Telugu, Kannada, Marathi, Gujarati, Malayalam, Punjabi, Odia, Urdu).
@@ -188,12 +189,12 @@ The result shows the rule verdict, Gemini's verdict + reasoning + novel tactics,
 
 ## Scope 
 - **Counterfeit screening** runs four explainable CV analyses (microprint, security-thread, RBI serial-format, UV-simulation) + an operator checklist across all 7 denominations — but it is **not** a UV/IR-hardware + trained-CNN system (UV is *simulated* from the photo); clearly disclaimed in-app, and high-quality fakes are the measured ~20% false-negatives.
-- **Voice-spoof** is heuristic audio forensics, not an ASVspoof-grade model; it ships labelled demo clips so the metric is real and reproducible.
+- **Voice-spoof** is an explainable audio-forensics **triage aid** (flags robotic / robocall-style signal characteristics), **not** a trained deepfake CNN — reliable AI-clone detection needs an ASVspoof-grade model. It is deliberately excluded from the measured-metrics table and headline claims, and pairs with the scam-script detector rather than standing alone.
 - **Fraud-graph & geo data** are realistic **synthetic** datasets modelled on NCRP/RBI reporting patterns — swap in live UPI/CDR/NCRP feeds in production.
 - **News** is live ET RSS, keyword-filtered; when ET has no fresh consumer-scam stories (or is unreachable) it shows curated fallback headlines, flagged in the UI.
 - **Bilingual UI**: all static UI + citizen advisories switch to Hindi. Some **engine-generated prose** (verdict summaries, factor descriptions, fraud-graph findings) is still emitted in English and would need a backend-localization pass for 100% Hindi.
 - **Counter-Intel honeypot** never pays and never shares real data — it only stalls the scammer and extracts *their* identifiers; the Gemini persona degrades to a template offline.
-- **Video-Call Shield** is frame-level forensics (a triage signal for the video-call vector), not a trained video-deepfake CNN — it pairs the score with the decisive caller-verification advice.
+- **Video-Call Shield** is frame-level forensics (a triage signal for the video-call vector),it pairs the score with the decisive caller-verification advice.
 - **One-Tap Complaint** generates a fully-drafted, NCRP-ready complaint + PDF for the citizen to submit; it does **not** auto-file into government systems (no public write API).
 - **Outbreak Early-Warning** is indicative trend-detection from live news + crowd reports, not an official government advisory.
 - **Fraud Shield channels**: Web, installable PWA and Telegram are live; **WhatsApp** (free Twilio Sandbox — auto-checks any inbound message, reply auto-localized to the sender's script) and **IVR** voice are Twilio-compatible TwiML webhooks that activate when a Twilio number/sandbox is pointed at them — no backend keys or Meta business verification needed. All 12 languages localize the *verdict advisory*; the chat greeting/sample chips are localized too.

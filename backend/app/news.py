@@ -8,6 +8,7 @@ during a demo. Results are cached in-memory for a few minutes.
 """
 from __future__ import annotations
 
+import html
 import re
 import time
 import urllib.request
@@ -44,6 +45,9 @@ def _clean(text: str) -> str:
     if not text:
         return ""
     text = _TAG_RE.sub("", text)
+    text = html.unescape(text)               # &amp; -> & , &#39; -> ' , &quot; -> "
+    if "&amp;" in text or "&#" in text:      # some ET feeds double-encode
+        text = html.unescape(text)
     return re.sub(r"\s+", " ", text).strip()
 
 

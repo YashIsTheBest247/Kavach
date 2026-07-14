@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Radar, RefreshCw, TrendingUp, Newspaper, Users, AlertTriangle, Activity } from 'lucide-react'
+import { Radar, RefreshCw, TrendingUp, Newspaper, Users, AlertTriangle, Activity, ExternalLink } from 'lucide-react'
 import { PageHeader } from './ConsoleLayout.jsx'
 import { RiskBadge, Spinner } from '../components/ui.jsx'
 import { getOutbreakAlerts } from '../api.js'
@@ -69,7 +69,15 @@ export default function OutbreakAlerts() {
                       <span className="flex items-center gap-1"><Activity size={13} /> {a.reports_last_14d} {t('recent', 'हालिया')}</span>
                     </div>
                     {a.headline_sample && (
-                      <div className="mt-3 text-xs text-gray-400 bg-ink-900 border border-white/8 rounded-lg p-2.5 line-clamp-2">“{a.headline_sample}”</div>
+                      a.headline_link ? (
+                        <a href={a.headline_link} target="_blank" rel="noreferrer"
+                          className="mt-3 flex items-start gap-1.5 text-xs text-gray-400 bg-ink-900 border border-white/8 rounded-lg p-2.5 hover:border-brand/40 hover:text-gray-200 transition-colors">
+                          <span className="line-clamp-2">“{a.headline_sample}”</span>
+                          <ExternalLink size={12} className="shrink-0 mt-0.5 text-brand" />
+                        </a>
+                      ) : (
+                        <div className="mt-3 text-xs text-gray-400 bg-ink-900 border border-white/8 rounded-lg p-2.5 line-clamp-2">“{a.headline_sample}”</div>
+                      )
                     )}
                     <div className="mt-3 rounded-lg bg-brand/5 border border-brand/20 p-3 text-sm text-gray-100">{a.advice}</div>
                   </div>

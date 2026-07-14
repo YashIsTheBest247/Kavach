@@ -142,4 +142,7 @@ def counterfeit_metrics(n_per_class: int = 15) -> Dict:
 
 
 def all_metrics() -> Dict:
-    return {"scam": scam_metrics(), "voice": voice_metrics(), "counterfeit": counterfeit_metrics()}
+    # Voice-spoof is an explainable triage aid, not a benchmarked deepfake model —
+    # it is intentionally excluded from the measured-metrics table so nothing is
+    # overclaimed. Only the two detectors with honest labelled evals are reported.
+    return {"scam": scam_metrics(), "counterfeit": counterfeit_metrics()}

@@ -31,10 +31,10 @@ export default function Metrics() {
               </div>
             </div>
 
-            <MetricBlock data={m.scam} icon={ShieldCheck} highlight="false_positive_rate"
-              highlightLabel={t('False-positive rate (citizen false alarms)', 'फ़ॉल्स-पॉज़िटिव दर (नागरिक झूठे अलार्म)')} />
-            <MetricBlock data={m.voice} icon={ShieldCheck} highlight="false_negative_rate"
-              highlightLabel={t('False-negative rate (deepfakes missed)', 'फ़ॉल्स-नेगेटिव दर (छूटे डीपफेक)')} />
+            {m.scam && (
+              <MetricBlock data={m.scam} icon={ShieldCheck} highlight="false_positive_rate"
+                highlightLabel={t('False-positive rate (citizen false alarms)', 'फ़ॉल्स-पॉज़िटिव दर (नागरिक झूठे अलार्म)')} />
+            )}
             {m.counterfeit && (
               <MetricBlock data={m.counterfeit} icon={ShieldCheck} highlight="false_negative_rate"
                 highlightLabel={t('False-negative rate (fakes passed as genuine)', 'फ़ॉल्स-नेगेटिव दर (असली माने गए नकली)')} />

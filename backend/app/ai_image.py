@@ -88,6 +88,6 @@ def screen(img_bytes: bytes) -> Dict:
         "confidence": round(0.55 + 0.4 * abs(risk - 0.5), 2),
         "factors": factors,
         "dimensions": f"{w}x{h}",
-        "disclaimer": "Heuristic forensics MVP — not a trained CNN. Use as a triage signal for fake "
+        "disclaimer": "Heuristic forensics MVP. Use as a triage signal for fake "
                       "profile photos / forged IDs, alongside human review.",
     }

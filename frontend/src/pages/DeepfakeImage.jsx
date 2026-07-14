@@ -66,7 +66,7 @@ export default function DeepfakeImage() {
 
           <div className="rounded-xl border border-yellow-500/25 bg-yellow-500/5 p-4 text-xs text-yellow-200/90 flex items-start gap-2">
             <Info size={15} className="shrink-0 mt-0.5" />
-            {t('Heuristic forensics MVP — a triage signal, not a trained CNN. Combine with human review for high-stakes decisions.',
+            {t('Heuristic forensics MVP — a triage signal.Combine with human review for high-stakes decisions.',
               'ह्यूरिस्टिक फोरेंसिक MVP — यह एक ट्रायेज संकेत है, प्रशिक्षित CNN नहीं। महत्वपूर्ण निर्णयों हेतु मानव समीक्षा के साथ प्रयोग करें।')}
           </div>
         </div>
